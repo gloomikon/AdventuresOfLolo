@@ -7,12 +7,19 @@
 #include <QPainter>
 #include <cmath>
 #include <QKeyEvent>
+#include <QTimer>
+#include <QThread>
+#include <QDebug>
+
+
 Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
     this->setFixedSize(13*128,13*128);
     this->setWindowTitle("Adventures of Lolo by KOLUMBIA");
     this->game = new Game("level1.txt");
+    this->timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(ex_code()));
     QRect rect;
     for (unsigned int i = 0; i < this->game->height; i++)
         for (unsigned int j = 0; j < this->game->width; j++)
@@ -28,7 +35,7 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
         }
 
     std::ofstream file;
-    file.open("C://Users/gloomikon/Documents/AdventuresOfLolo/lvls/level1o.txt");
+    file.open("C://Users/gloomikon/Documents/AndenturesOfLolo/lvls/level1o.txt");
     for (int i =0; i < this->game->height; i++)
     {
         for (int j = 0; j < this->game->width; j++)
@@ -68,10 +75,13 @@ void Widget::drawSurface()
             }
         }
 }
-void Widget::drawLolo()
+void Widget::drawLolo(std::string image)
 {
     QPainter painter(this);
-    QPixmap pixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/lolo.png");
+    std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
+    path += image;
+    path += ".png";
+    QPixmap pixmap(path.c_str());
     painter.drawPixmap(this->rectLolo, pixmap);
 }
 void Widget::drawObjects()
@@ -104,36 +114,85 @@ void Widget::paintEvent(QPaintEvent *)
 {
     this->drawSurface();
     this->drawObjects();
-    this->drawLolo();
+    this->drawLolo(this->imgLolo);
 }
-void Widget::keyPressEvent(QKeyEvent *e)
+
+void Widget::ex_code()
 {
     int *x1 = new int;
     int *y1 = new int;
     int *x2 = new int;
     int *y2 = new int;
     this->rectLolo.getCoords(x1, y1, x2, y2);
-    if (e->key() == Qt::Key_S || e->key() == Qt::Key_Down)
+    if (this->direction == 6)
     {
-        this->rectLolo.moveTop(*y1 + 64);
-        this->game->lolo->x++;
+        this->rectLolo.moveTop(*y1 + 4);
+        this->steps+=4;
+        if (this->steps >= 8 && this->steps < 16)
+            this->imgLolo = "lolodown1";
+        else if (this->steps >= 16 && this->steps < 24)
+            this->imgLolo = "lolodown2";
+        else if (this->steps >= 24 && this->steps < 32)
+            this->imgLolo = "lolodown1";
+        else if (this->steps >= 32 && this->steps < 40)
+            this->imgLolo = "lolodown3";
+        else if (this->steps >= 40 && this->steps < 48)
+            this->imgLolo = "lolodown4";
+        else if (this->steps >= 48 && this->steps < 56)
+            this->imgLolo = "lolodown3";
+        else if (this->steps >= 56 && this->steps < 64)
+            this->imgLolo = "lolo";
+        else if (this->steps == 64)
+        {
+            this->steps = 0;
+            this->timer->stop();
+        }
     }
-    if (e->key() == Qt::Key_W || e->key() == Qt::Key_Up)
+    if (this->direction == 12)
     {
-        this->rectLolo.moveTop(*y1 - 64);
-        this->game->lolo->x--;
+        this->rectLolo.moveTop(*y1 - 4);
+        this->steps+=4;
+        if (this->steps >= 8 && this->steps < 16)
+            this->imgLolo = "loloup1";
+        else if (this->steps >= 16 && this->steps < 24)
+            this->imgLolo = "loloup2";
+        else if (this->steps >= 24 && this->steps < 32)
+            this->imgLolo = "loloup1";
+        else if (this->steps >= 32 && this->steps < 40)
+            this->imgLolo = "loloup3";
+        else if (this->steps >= 40 && this->steps < 48)
+            this->imgLolo = "loloup4";
+        else if (this->steps >= 48 && this->steps < 56)
+            this->imgLolo = "loloup3";
+        else if (this->steps >= 56 && this->steps < 64)
+            this->imgLolo = "loloup";
+        else if (this->steps == 64)
+        {
+            this->steps = 0;
+            this->timer->stop();
+        }
     }
-    if (e->key() == Qt::Key_A || e->key() == Qt::Key_Left)
-    {
-        this->rectLolo.moveLeft(*x1 - 64);
-        this->game->lolo->x++;
-    }
-    if (e->key() == Qt::Key_D || e->key() == Qt::Key_Right)
-    {
-        this->rectLolo.moveLeft(*x1 + 64);
-        this->game->lolo->x++;
-    }
+            qDebug() << this->steps << this->timer->isActive();
+
     update();
+}
+void Widget::keyPressEvent(QKeyEvent *e)
+{
+    if (!(this->timer->isActive()))
+    {
+        if (e->key() == Qt::Key_S || e->key() == Qt::Key_Down)
+        {
+            this->imgLolo = "lolodown1";
+            this->direction = 6;
+            timer->start(1);
+        }
+        if (e->key() == Qt::Key_W || e->key() == Qt::Key_Up)
+        {
+            this->imgLolo = "loloup1";
+            this->direction = 12;
+            timer->start(1);
+        }
+    }
 }
 Widget::~Widget()
 {
