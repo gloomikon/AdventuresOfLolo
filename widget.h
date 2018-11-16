@@ -16,7 +16,6 @@ class Widget : public QWidget
 public:
     QRect   rectLolo;
     explicit Widget(QWidget *parent = nullptr);
-    unsigned int    steps = 0;
     unsigned int    direction = 6;
     QTimer          *timer;
     ~Widget();
@@ -28,7 +27,7 @@ private:
     std::string imgLolo = "lolo";
     void        drawSurface();
     void        drawObjects();
-    void        drawLolo(std::string image);
+    void        drawLolo();
 protected:
     void    paintEvent(QPaintEvent *);
     void    keyPressEvent(QKeyEvent *);
