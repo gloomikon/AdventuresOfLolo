@@ -27,6 +27,7 @@ private:
     std::string imgLolo = "lolo";
     void        drawSurface();
     void        drawObjects();
+    void        updBg();
     void        drawLolo();
 protected:
     void    paintEvent(QPaintEvent *);

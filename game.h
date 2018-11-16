@@ -3,13 +3,14 @@
 
 #include <iostream>
 #include "lolo.h"
+#include "personages.h"
 
 class Game
 {
 private:
     struct  cell
     {
-        void        *ptr;
+        Objects     *ptr;
         char        typeOfSurface;
         char        typeOfSthElse;
         std::string imgName;
@@ -21,8 +22,12 @@ public:
     cell            *map;
     Lolo            *lolo;
 
+    bool            canMoveLeft(Personages *p);
+    bool            canMoveRight(Personages *p);
+    bool            canMoveUp(Personages *p);
+    bool            canMoveDown(Personages *p);
+
     Game(std::string fileName);
-    Game::cell   *returnMap();
     ~Game();
 };
 

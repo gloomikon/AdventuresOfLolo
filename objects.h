@@ -9,6 +9,8 @@ private:
 protected:
 public:
     Objects(bool shootable, bool walkable);
+    bool    isShootable();
+    bool    isWalkable();
 };
 
 #endif // OBJECTS_H

@@ -6,10 +6,9 @@
 class Lolo : public Personages
 {
 private:
-    unsigned int    hp;
     unsigned int    shoots;
 public:
-    Lolo(unsigned int moveSpeed, unsigned int x, unsigned int y, unsigned int hp, unsigned int shoots);
+    Lolo(unsigned int x, unsigned int y, unsigned int direction);
 };
 
 #endif // LOLO_H
