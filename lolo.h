@@ -6,9 +6,10 @@
 class Lolo : public Personages
 {
 private:
-    unsigned int    shoots;
+    int    shoots;
 public:
-    Lolo(unsigned int x, unsigned int y, unsigned int direction);
+    Lolo(int x, int y, int direction);
+    void    makeWalkable();
 };
 
 #endif // LOLO_H

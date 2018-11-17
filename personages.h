@@ -8,13 +8,13 @@ class Personages : public Objects
 private:
 protected:
 public:
-    unsigned int    x;
-    unsigned int    y;
-    unsigned int    stepUpDown;
-    unsigned int    stepLeftRight;
-    unsigned int    direction;
+    int    x;
+    int    y;
+    int    stepUpDown;
+    int    stepLeftRight;
+    int    direction;
 
-    Personages(bool shootable, unsigned int x, unsigned int y, unsigned int direction);
+    Personages(bool shootable, int x, int y, int direction);
 };
 
 #endif // PERSONAGES_H

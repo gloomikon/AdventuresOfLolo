@@ -5,50 +5,89 @@
 #include "personages.h"
 #include "lolo.h"
 #include "heart.h"
+#include "chest.h"
+
+#include <QDebug>
 
 static const std::string LVL_PATH = "C://Users/gloomikon/Documents/AndenturesOfLolo/lvls/";
 
 bool Game::canMoveLeft(Personages *p)
 {
-    if (!(this->map[p->y * this->width + p->x - 1].ptr->isWalkable()))
-        return (false);
-    if (p->stepUpDown == 12 &&
-            !(this->map[(p->y - 1) * this->width + p->x - 1].ptr->isWalkable()))
-        return (false);
-    if (p->stepUpDown == 6 &&
-            !(this->map[(p->y + 1) * this->width + p->x - 1].ptr->isWalkable()))
-        return (false);
+    if (p->stepLeftRight == 3)
+        return (true);
+    if (this->map[p->y * this->width + p->x - 1].ptr)
+    {
+        if (!(this->map[p->y * this->width + p->x - 1].ptr->isWalkable()))
+            return (false);
+    }
+    if (this->map[(p->y - 1) * this->width + p->x - 1].ptr)
+    {
+        if (p->stepUpDown == 12 &&
+                !(this->map[(p->y - 1) * this->width + p->x - 1].ptr->isWalkable()))
+            return (false);
+    }
+    if (this->map[(p->y + 1) * this->width + p->x - 1].ptr)
+    {
+        if (p->stepUpDown == 6 &&
+                !(this->map[(p->y + 1) * this->width + p->x - 1].ptr->isWalkable()))
+            return (false);
+    }
     return (true);
 }
 
 bool Game::canMoveRight(Personages *p)
 {
-    if (!(this->map[p->y * this->width + p->x + 1].ptr->isWalkable()))
-        return (false);
-    if (p->stepUpDown == 12 &&
-            !(this->map[(p->y - 1) * this->width + p->x + 1].ptr->isWalkable()))
-        return (false);
-    if (p->stepUpDown == 6 &&
-            !(this->map[(p->y + 1) * this->width + p->x + 1].ptr->isWalkable()))
-        return (false);
+    if (p->stepLeftRight == 9)
+        return (true);
+    if (this->map[p->y * this->width + p->x + 1].ptr)
+    {
+        if (!(this->map[p->y * this->width + p->x + 1].ptr->isWalkable()))
+            return (false);
+    }
+    if (this->map[(p->y - 1) * this->width + p->x + 1].ptr)
+    {
+        if (p->stepUpDown == 12 &&
+                !(this->map[(p->y - 1) * this->width + p->x + 1].ptr->isWalkable()))
+            return (false);
+    }
+    if (this->map[(p->y + 1) * this->width + p->x + 1].ptr)
+    {
+        if (p->stepUpDown == 6 &&
+                !(this->map[(p->y + 1) * this->width + p->x + 1].ptr->isWalkable()))
+            return (false);
+    }
     return (true);
 }
 
 bool Game::canMoveUp(Personages *p)
 {
-    if (!(this->map[(p->y - 1) * this->width + p->x].ptr->isWalkable()))
-        return (false);
-    if (p->stepLeftRight == 3 &&
-            !(this->map[(p->y - 1) * this->width + (p->x + 1)].ptr->isWalkable()))
-        return (false);
-    if (p->stepLeftRight == 9 &&
-            !(this->map[(p->y - 1) * this->width + (p->x - 1)].ptr->isWalkable()))
-        return (false);
+    if (p->stepUpDown == 6)
+        return (true);
+    if (this->map[(p->y - 1) * this->width + p->x].ptr)
+    {
+                    qDebug() << (p->y - 1) * this->width + p->x;
+        if (!(this->map[(p->y - 1) * this->width + p->x].ptr->isWalkable()))
+            return (false);
+    }
+    if (this->map[(p->y - 1) * this->width + (p->x + 1)].ptr)
+    {
+        if (p->stepLeftRight == 3 &&
+                !(this->map[(p->y - 1) * this->width + (p->x + 1)].ptr->isWalkable()))
+            return (false);
+    }
+    if (this->map[(p->y - 1) * this->width + (p->x - 1)].ptr)
+    {
+        if (p->stepLeftRight == 9 &&
+                !(this->map[(p->y - 1) * this->width + (p->x - 1)].ptr->isWalkable()))
+            return (false);
+    }
     return (true);
 }
 
 bool Game::canMoveDown(Personages *p)
 {
+    if (p->stepUpDown == 12)
+        return (true);
     if (this->map[(p->y + 1) * this->width + p->x].ptr)
     {
         if (!(this->map[(p->y + 1) * this->width + p->x].ptr->isWalkable()))
@@ -72,18 +111,18 @@ bool Game::canMoveDown(Personages *p)
 Game::Game(std::string fileName)
 {
     std::ifstream   file;
-    unsigned int    x = 0;
-    unsigned int    y = 0;
+    int    x = 0;
+    int    y = 0;
     char            c;
 
 
     file.open(LVL_PATH + fileName);
     file >> x >> y;
-    this->map = new Game::cell[x * y];
+    this->map = new Game::cell[static_cast<unsigned int>(x * y)];
     this->height = y;
     this->width = x;
-    for (unsigned int i = 0; i < y; i++)
-        for (unsigned int j = 0; j < x; j++)
+    for (int i = 0; i < y; i++)
+        for (int j = 0; j < x; j++)
         {
             file >> c;
             this->map[i * x + j].typeOfSurface = 'f';
@@ -127,14 +166,14 @@ Game::Game(std::string fileName)
             case 'H':
             {
                 this->map[i * x + j].ptr = static_cast<Objects*>(new Heart(true, true, 2));
-                this->map[i * x + j].typeOfSthElse = 'H';
+                this->map[i * x + j].typeOfSthElse = 'h';
                 this->map[i * x + j].imgName = "heart";
                 break;
             }
             case 'h':
             {
                 this->map[i * x + j].ptr = static_cast<Objects*>(new Heart(true, true, 0));
-                this->map[i * x + j].typeOfSthElse = 'H';
+                this->map[i * x + j].typeOfSthElse = 'h';
                 this->map[i * x + j].imgName = "heart";
                 break;
             }
@@ -142,12 +181,16 @@ Game::Game(std::string fileName)
             {
                 this->map[i * x + j].ptr = static_cast<Objects*>(new Lolo(j,i,6));
                 this->lolo = static_cast<Lolo*>(this->map[i * x + j].ptr);
+                this->lolo->makeWalkable();
                 this->map[i * x + j].typeOfSthElse = 'L';
                 this->map[i * x + j].imgName = "lolo";
                 break;
             }
             case 'C':
             {
+                this->map[i * x + j].ptr = static_cast<Objects*>(new Chest());
+                this->map[i * x + j].typeOfSthElse = 'c';
+                this->map[i * x + j].imgName = "chest01";
                 break;
             }
             default:
@@ -157,6 +200,7 @@ Game::Game(std::string fileName)
             }
             }
         }
+    file.close();
 }
 
 

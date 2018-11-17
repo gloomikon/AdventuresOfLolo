@@ -4,9 +4,9 @@
 class Objects
 {
 private:
+protected:
     bool            shootable;
     bool            walkable;
-protected:
 public:
     Objects(bool shootable, bool walkable);
     bool    isShootable();

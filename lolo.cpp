@@ -1,5 +1,10 @@
 #include "lolo.h"
 
-Lolo::Lolo(unsigned int x, unsigned int y, unsigned int direction):
+Lolo::Lolo(int x, int y, int direction):
     Personages(true, x, y, direction), shoots{0}
 {}
+
+void Lolo::makeWalkable()
+{
+    this->walkable = true;
+}

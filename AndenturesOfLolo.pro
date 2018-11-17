@@ -29,7 +29,8 @@ SOURCES += \
     personages.cpp \
     lolo.cpp \
     game.cpp \
-    heart.cpp
+    heart.cpp \
+    chest.cpp
 
 HEADERS += \
         widget.h \
@@ -37,7 +38,8 @@ HEADERS += \
     personages.h \
     lolo.h \
     game.h \
-    heart.h
+    heart.h \
+    chest.h
 
 FORMS += \
         widget.ui

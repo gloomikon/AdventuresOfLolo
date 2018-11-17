@@ -17,10 +17,10 @@ private:
     };
 
 public:
-    unsigned int    height;
-    unsigned int    width;
-    cell            *map;
-    Lolo            *lolo;
+    int     height;
+    int     width;
+    cell    *map;
+    Lolo    *lolo;
 
     bool            canMoveLeft(Personages *p);
     bool            canMoveRight(Personages *p);
