@@ -6,9 +6,9 @@
 class Lolo : public Personages
 {
 private:
-public:
     int    shoots;
-    Lolo(int x, int y, int direction);
+public:
+    Lolo(int x, int y, int direction, QRect rect, QPixmap pixmap, std::string imgName);
     void    makeWalkable();
 };
 

@@ -10,17 +10,15 @@ private:
     struct  cell
     {
         Objects     *ptr;
-        bool        isLoloHere = false;
+        bool        isSome1Here = false;
         char        typeOfSurface;
         char        typeOfSthElse;
-        std::string imgName;
     };
-
+    bool    heartPicked;
+    int     lives;
 public:
     cell    *map;
     Lolo    *lolo;
-    int     lives;
-    bool    heartPicked;
 
     bool            wasHeartPicked();
     void            setHeartPickedStatus(bool picked);

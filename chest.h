@@ -8,7 +8,7 @@ class Chest : public Objects
 private:
     bool    opened;
 public:
-    Chest();
+    Chest(std::string imgName);
     bool    isOpened();
 };
 

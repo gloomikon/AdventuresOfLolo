@@ -14,20 +14,18 @@ class Widget : public QWidget
     Q_OBJECT
 
 public:
-    QRect   rectLolo;
     explicit Widget(QWidget *parent = nullptr);
-    unsigned int    direction = 6;
-    QTimer          *timer;
     ~Widget();
+
+     QTimer          *timer;
 public slots:
     void        ex_code();
 private:
     Ui::Widget  *ui;
     Game        *game;
-    std::string imgLolo = "lolo";
     void        drawSurface();
     void        drawObjects();
-    void        updBg();
+    void        updBg(Personages *p);
     void        drawLolo();
 protected:
     void    paintEvent(QPaintEvent *);
