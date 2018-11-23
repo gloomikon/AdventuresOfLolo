@@ -1,31 +1,29 @@
 #ifndef GAME_H
-#define GAME_H
-
-#include <iostream>
-#include "lolo.h"
-#include "personages.h"
-
+# define GAME_H
+# include <iostream>
+# include "chest.h"
+# include "heart.h"
+# include "lolo.h"
 class Game
 {
 private:
     struct  cell
     {
         Objects     *ptr;
+        bool        isLoloHere = false;
         char        typeOfSurface;
         char        typeOfSthElse;
         std::string imgName;
     };
 
 public:
-    int     height;
-    int     width;
     cell    *map;
     Lolo    *lolo;
+    int     lives;
+    bool    heartPicked;
 
-    bool            canMoveLeft(Personages *p);
-    bool            canMoveRight(Personages *p);
-    bool            canMoveUp(Personages *p);
-    bool            canMoveDown(Personages *p);
+    bool            wasHeartPicked();
+    void            setHeartPickedStatus(bool picked);
 
     Game(std::string fileName);
     ~Game();

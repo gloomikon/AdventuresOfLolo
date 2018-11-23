@@ -1,13 +1,13 @@
 #ifndef LOLO_H
-#define LOLO_H
+# define LOLO_H
 
-#include "personages.h"
+# include "personages.h"
 
 class Lolo : public Personages
 {
 private:
-    int    shoots;
 public:
+    int    shoots;
     Lolo(int x, int y, int direction);
     void    makeWalkable();
 };

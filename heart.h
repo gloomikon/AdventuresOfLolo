@@ -6,9 +6,8 @@
 class Heart : public Objects
 {
 private:
-    int    giveAmmo;
 public:
-    Heart(bool shootable, bool walkable, int giveAmmo);
+    Heart(bool shootable, bool walkable);
 };
 
 #endif // HEART_H

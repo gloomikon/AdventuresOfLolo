@@ -1,6 +1,7 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include "game.h"
+#include "heart.h"
 
 #include <fstream>
 #include <QMessageBox>
@@ -22,10 +23,10 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     this->timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(ex_code()));
     QRect rect;
-    for (int i = 0; i < this->game->height; i++)
-        for (int j = 0; j < this->game->width; j++)
+    for (int i = 0; i < HEIGHT; i++)
+        for (int j = 0; j < WIDTH; j++)
         {
-            if (this->game->map[i * this->game->width + j].typeOfSthElse == 'L')
+            if (this->game->map[i * WIDTH + j].typeOfSthElse == 'L')
             {
                 rect.setCoords(static_cast<int>(j) * 128,
                                static_cast<int>(i) * 128,
@@ -37,9 +38,9 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
 
     /*std::ofstream file;
     file.open("C://Users/gloomikon/Documents/AndenturesOfLolo/lvls/level1o.txt");
-    for (int i =0; i < this->game->height; i++)
+    for (int i =0; i < HEIGHT; i++)
     {
-        for (int j = 0; j < this->game->width; j++)
+        for (int j = 0; j < WIDTH; j++)
             file << this->game->map[i * 13 + j].typeOfSurface;
         file << "\n";
     }
@@ -51,24 +52,24 @@ void Widget::drawSurface()
     QPainter painter(this);
     QRect rect;
 
-    for (int i = 0; i < this->game->height; i++)
-        for (int j = 0; j < this->game->width; j++)
+    for (int i = 0; i < HEIGHT; i++)
+        for (int j = 0; j < WIDTH; j++)
         {
             rect.setCoords(static_cast<int>(j) * 128,
                            static_cast<int>(i) * 128,
                            static_cast<int>((j + 1)) * 128,
                            static_cast<int>((i + 1)) * 128);
             std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-            path += this->game->map[i * this->game->width + j].typeOfSurface;
+            path += this->game->map[i * WIDTH + j].typeOfSurface;
             path += ".png";
             QPixmap pixmap(path.c_str());
             painter.drawPixmap(rect, pixmap);
-            if (this->game->map[i * this->game->width + j].typeOfSthElse == 't' ||
-                this->game->map[i * this->game->width + j].typeOfSthElse == 'r' ||
-                this->game->map[i * this->game->width + j].typeOfSthElse == 'e')
+            if (this->game->map[i * WIDTH + j].typeOfSthElse == 't' ||
+                this->game->map[i * WIDTH + j].typeOfSthElse == 'r' ||
+                this->game->map[i * WIDTH + j].typeOfSthElse == 'e')
             {
                 path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-                path += this->game->map[i * this->game->width + j].typeOfSthElse;
+                path += this->game->map[i * WIDTH + j].typeOfSthElse;
                 path += ".png";
                 QPixmap pixmap(path.c_str());
                 painter.drawPixmap(rect, pixmap);
@@ -89,20 +90,20 @@ void Widget::drawObjects()
     QPainter painter(this);
     QRect rect;
 
-    for (int i = 0; i < this->game->height; i++)
-        for (int j = 0; j < this->game->width; j++)
+    for (int i = 0; i < HEIGHT; i++)
+        for (int j = 0; j < WIDTH; j++)
         {
-            if (!(this->game->map[i * this->game->width + j].typeOfSthElse == 't' ||
-                  this->game->map[i * this->game->width + j].typeOfSthElse == 'r' ||
-                  this->game->map[i * this->game->width + j].typeOfSthElse == 'e' ||
-                  this->game->map[i * this->game->width + j].typeOfSthElse == 'L'))
+            if (!(this->game->map[i * WIDTH + j].typeOfSthElse == 't' ||
+                  this->game->map[i * WIDTH + j].typeOfSthElse == 'r' ||
+                  this->game->map[i * WIDTH + j].typeOfSthElse == 'e' ||
+                  this->game->map[i * WIDTH + j].typeOfSthElse == 'L'))
             {
                 rect.setCoords(static_cast<int>(j) * 128,
                                static_cast<int>(i) * 128,
                                static_cast<int>((j + 1)) * 128,
                                static_cast<int>((i + 1)) * 128);
                 std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-                path += this->game->map[i * this->game->width + j].imgName;
+                path += this->game->map[i * WIDTH + j].imgName;
                 path += ".png";
                 QPixmap pixmap(path.c_str());
                 painter.drawPixmap(rect, pixmap);
@@ -122,19 +123,19 @@ void Widget::updBg()
                            (this->game->lolo->x + i + 1) * 128,
                            (this->game->lolo->y + j + 1) * 128);
             std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-            path += this->game->map[(static_cast<int>(this->game->lolo->y) + j) * static_cast<int>(this->game->width) +
+            path += this->game->map[(static_cast<int>(this->game->lolo->y) + j) * static_cast<int>(WIDTH) +
                     static_cast<int>(this->game->lolo->x) + i].typeOfSurface;
             path += ".png";
             QPixmap pixmap(path.c_str());
             painter.drawPixmap(rect, pixmap);
 
             path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-            if (this->game->map[(this->game->lolo->y + j) * this->game->width + this->game->lolo->x + i].typeOfSthElse == 't' ||
-                this->game->map[(this->game->lolo->y + j) * this->game->width + this->game->lolo->x + i].typeOfSthElse == 'r' ||
-                this->game->map[(this->game->lolo->y + j) * this->game->width + this->game->lolo->x + i].typeOfSthElse == 'e')
-                path += this->game->map[(this->game->lolo->y + j) * this->game->width + this->game->lolo->x + i].typeOfSthElse;
-            else if (this->game->map[(this->game->lolo->y + j) * this->game->width + this->game->lolo->x + i].typeOfSthElse != 'L')
-                path += this->game->map[(this->game->lolo->y + j) * this->game->width + this->game->lolo->x + i].imgName;
+            if (this->game->map[(this->game->lolo->y + j) * WIDTH + this->game->lolo->x + i].typeOfSthElse == 't' ||
+                this->game->map[(this->game->lolo->y + j) * WIDTH + this->game->lolo->x + i].typeOfSthElse == 'r' ||
+                this->game->map[(this->game->lolo->y + j) * WIDTH + this->game->lolo->x + i].typeOfSthElse == 'e')
+                path += this->game->map[(this->game->lolo->y + j) * WIDTH + this->game->lolo->x + i].typeOfSthElse;
+            else if (this->game->map[(this->game->lolo->y + j) * WIDTH + this->game->lolo->x + i].typeOfSthElse != 'L')
+                path += this->game->map[(this->game->lolo->y + j) * WIDTH + this->game->lolo->x + i].imgName;
             path += ".png";
             pixmap = QPixmap(path.c_str());
             painter.drawPixmap(rect, pixmap);
@@ -167,7 +168,7 @@ void Widget::ex_code()
     //Down
     if (this->direction == 6)
     {
-        if (this->game->canMoveDown(this->game->lolo))
+        if (this->game->lolo->canMoveDown(this->game))
         {
             this->rectLolo.moveTop(*y1 + 4);
             steps+=4;
@@ -192,27 +193,25 @@ void Widget::ex_code()
                     if (this->game->lolo->stepUpDown == 6)
                     {
                         this->game->lolo->y++;
-                        this->game->map[(this->game->lolo->y - 1) * this->game->width + this->game->lolo->x].ptr = nullptr;
+                        this->game->map[(this->game->lolo->y - 1) * WIDTH + this->game->lolo->x].isLoloHere = false;
                     if (this->game->lolo->stepLeftRight == 3)
-                        this->game->map[(this->game->lolo->y - 1) * this->game->width + this->game->lolo->x + 1].ptr = nullptr;
+                        this->game->map[(this->game->lolo->y - 1) * WIDTH + this->game->lolo->x + 1].isLoloHere = false;
                     if (this->game->lolo->stepLeftRight == 9)
-                        this->game->map[(this->game->lolo->y - 1) * this->game->width + this->game->lolo->x - 1].ptr = nullptr;
-                    this->game->map[(this->game->lolo->y) * this->game->width + this->game->lolo->x].ptr = this->game->lolo;
+                        this->game->map[(this->game->lolo->y - 1) * WIDTH + this->game->lolo->x - 1].isLoloHere = false;
+                    this->game->map[(this->game->lolo->y) * WIDTH + this->game->lolo->x].isLoloHere = true;
                     if (this->game->lolo->stepLeftRight == 3)
-                        this->game->map[(this->game->lolo->y) * this->game->width + this->game->lolo->x + 1].ptr = this->game->lolo;
+                        this->game->map[(this->game->lolo->y) * WIDTH + this->game->lolo->x + 1].isLoloHere = true;
                     if (this->game->lolo->stepLeftRight == 9)
-                        this->game->map[(this->game->lolo->y) * this->game->width + this->game->lolo->x - 1].ptr = this->game->lolo;
+                        this->game->map[(this->game->lolo->y) * WIDTH + this->game->lolo->x - 1].isLoloHere = true;
                     }
                     this->game->lolo->stepUpDown = 0;
                 }
                 else
                 {
                     this->game->lolo->stepUpDown = 6;
-                    //this->game->map[(this->game->lolo->y - 1) * this->game->width + this->game->lolo->x].ptr = nullptr;
                 }
                 steps = 0;
                 this->timer->stop();
-                qDebug() << this->game->lolo->x << this->game->lolo->y << this->game->lolo->stepUpDown;
             }
         }
         else
@@ -221,7 +220,7 @@ void Widget::ex_code()
     //Up
     if (this->direction == 12)
     {
-        if (this->game->canMoveUp(this->game->lolo))
+        if (this->game->lolo->canMoveUp(this->game))
         {
             this->rectLolo.moveTop(*y1 - 4);
             steps+=4;
@@ -246,16 +245,16 @@ void Widget::ex_code()
                     if (this->game->lolo->stepUpDown == 12)
                     {
                         this->game->lolo->y--;
-                        this->game->map[(this->game->lolo->y + 1) * this->game->width + this->game->lolo->x].ptr = nullptr;
+                        this->game->map[(this->game->lolo->y + 1) * WIDTH + this->game->lolo->x].isLoloHere = false;
                         if (this->game->lolo->stepLeftRight == 3)
-                            this->game->map[(this->game->lolo->y + 1) * this->game->width + this->game->lolo->x + 1].ptr = nullptr;
+                            this->game->map[(this->game->lolo->y + 1) * WIDTH + this->game->lolo->x + 1].isLoloHere = false;
                         if (this->game->lolo->stepLeftRight == 9)
-                            this->game->map[(this->game->lolo->y + 1) * this->game->width + this->game->lolo->x - 1].ptr = nullptr;
-                        this->game->map[(this->game->lolo->y) * this->game->width + this->game->lolo->x].ptr = this->game->lolo;
+                            this->game->map[(this->game->lolo->y + 1) * WIDTH + this->game->lolo->x - 1].isLoloHere = false;
+                        this->game->map[(this->game->lolo->y) * WIDTH + this->game->lolo->x].isLoloHere = true;
                         if (this->game->lolo->stepLeftRight == 3)
-                            this->game->map[(this->game->lolo->y) * this->game->width + this->game->lolo->x + 1].ptr = this->game->lolo;
+                            this->game->map[(this->game->lolo->y) * WIDTH + this->game->lolo->x + 1].isLoloHere = true;
                         if (this->game->lolo->stepLeftRight == 9)
-                            this->game->map[(this->game->lolo->y) * this->game->width + this->game->lolo->x - 1].ptr = this->game->lolo;
+                            this->game->map[(this->game->lolo->y) * WIDTH + this->game->lolo->x - 1].isLoloHere = true;
                     }
                     this->game->lolo->stepUpDown = 0;
                 }
@@ -263,7 +262,6 @@ void Widget::ex_code()
                     this->game->lolo->stepUpDown = 12;
                 steps = 0;
                 this->timer->stop();
-                qDebug() << this->game->lolo->x << this->game->lolo->y << this->game->lolo->stepUpDown;
             }
         }
         else
@@ -272,7 +270,7 @@ void Widget::ex_code()
     //Left
     if (this->direction == 9)
     {
-        if (this->game->canMoveLeft(this->game->lolo))
+        if (this->game->lolo->canMoveLeft(this->game))
         {
             this->rectLolo.moveLeft(*x1 - 4);
             steps+=4;
@@ -296,21 +294,20 @@ void Widget::ex_code()
                 {
                     if (this->game->lolo->stepLeftRight == 9)
                         this->game->lolo->x--;
-                    this->game->map[(this->game->lolo->y) * this->game->width + this->game->lolo->x + 1].ptr = nullptr;
+                    this->game->map[(this->game->lolo->y) * WIDTH + this->game->lolo->x + 1].isLoloHere = false;
                     if (this->game->lolo->stepUpDown == 12)
-                        this->game->map[(this->game->lolo->y - 1) * this->game->width + this->game->lolo->x + 1].ptr = nullptr;
+                        this->game->map[(this->game->lolo->y - 1) * WIDTH + this->game->lolo->x + 1].isLoloHere = false;
                     if (this->game->lolo->stepUpDown == 6)
-                        this->game->map[(this->game->lolo->y + 1) * this->game->width + this->game->lolo->x + 1].ptr = nullptr;
-                    this->game->map[(this->game->lolo->y) * this->game->width + this->game->lolo->x].ptr = this->game->lolo;
+                        this->game->map[(this->game->lolo->y + 1) * WIDTH + this->game->lolo->x + 1].isLoloHere = false;
+                    this->game->map[(this->game->lolo->y) * WIDTH + this->game->lolo->x].isLoloHere = true;
                     if (this->game->lolo->stepUpDown == 12)
-                        this->game->map[(this->game->lolo->y - 1) * this->game->width + this->game->lolo->x].ptr = this->game->lolo;
+                        this->game->map[(this->game->lolo->y - 1) * WIDTH + this->game->lolo->x].isLoloHere = true;
                     if (this->game->lolo->stepUpDown == 6)
-                        this->game->map[(this->game->lolo->y + 1) * this->game->width + this->game->lolo->x].ptr = this->game->lolo;
+                        this->game->map[(this->game->lolo->y + 1) * WIDTH + this->game->lolo->x].isLoloHere = true;
                     this->game->lolo->stepLeftRight = 0;
                 }
                 else
                     this->game->lolo->stepLeftRight = 9;
-                qDebug() << this->game->lolo->x << this->game->lolo->y;
                 steps = 0;
                 this->timer->stop();
             }
@@ -321,7 +318,7 @@ void Widget::ex_code()
     //Right
     if (this->direction == 3)
     {
-        if (this->game->canMoveRight(this->game->lolo))
+        if (this->game->lolo->canMoveRight(this->game))
         {
             this->rectLolo.moveLeft(*x1 + 4);
             steps+=4;
@@ -345,27 +342,41 @@ void Widget::ex_code()
                 {
                     if (this->game->lolo->stepLeftRight == 3)
                         this->game->lolo->x++;
-                    this->game->map[(this->game->lolo->y) * this->game->width + this->game->lolo->x - 1].ptr = nullptr;
+                    this->game->map[(this->game->lolo->y) * WIDTH + this->game->lolo->x - 1].isLoloHere = false;
                     if (this->game->lolo->stepUpDown == 12)
-                        this->game->map[(this->game->lolo->y - 1) * this->game->width + this->game->lolo->x - 1].ptr = nullptr;
+                        this->game->map[(this->game->lolo->y - 1) * WIDTH + this->game->lolo->x - 1].isLoloHere = false;
                     if (this->game->lolo->stepUpDown == 6)
-                        this->game->map[(this->game->lolo->y + 1) * this->game->width + this->game->lolo->x - 1].ptr = nullptr;
-                    this->game->map[(this->game->lolo->y) * this->game->width + this->game->lolo->x].ptr = this->game->lolo;
+                        this->game->map[(this->game->lolo->y + 1) * WIDTH + this->game->lolo->x - 1].isLoloHere = false;
+                    this->game->map[(this->game->lolo->y) * WIDTH + this->game->lolo->x].isLoloHere = true;
                     if (this->game->lolo->stepUpDown == 12)
-                        this->game->map[(this->game->lolo->y - 1) * this->game->width + this->game->lolo->x].ptr = this->game->lolo;
+                        this->game->map[(this->game->lolo->y - 1) * WIDTH + this->game->lolo->x].isLoloHere = true;
                     if (this->game->lolo->stepUpDown == 6)
-                        this->game->map[(this->game->lolo->y + 1) * this->game->width + this->game->lolo->x].ptr = this->game->lolo;
+                        this->game->map[(this->game->lolo->y + 1) * WIDTH + this->game->lolo->x].isLoloHere = true;
                     this->game->lolo->stepLeftRight = 0;
                 }
                 else
                     this->game->lolo->stepLeftRight = 3;
-                qDebug() << this->game->lolo->x << this->game->lolo->y;
                 steps = 0;
                 this->timer->stop();
             }
         }
         else
             this->timer->stop();
+    }
+    if (this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].typeOfSthElse == 'h')
+    {
+        if (!this->game->wasHeartPicked())
+        {
+            this->game->setHeartPickedStatus(true);
+            this->game->lolo->shoots = 2;
+        }
+        delete static_cast<Heart*>(this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].ptr);
+        //qDebug() << this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].ptr;
+        this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].isLoloHere = false;
+        this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].ptr = nullptr;
+        this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].typeOfSthElse = 'f';
+        this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].imgName = "";
+
     }
     update();
 }

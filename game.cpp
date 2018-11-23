@@ -1,114 +1,22 @@
 #include <fstream>
 #include <string.h>
 #include "game.h"
-#include "objects.h"
-#include "personages.h"
-#include "lolo.h"
-#include "heart.h"
-#include "chest.h"
 
 #include <QDebug>
 
 static const std::string LVL_PATH = "C://Users/gloomikon/Documents/AndenturesOfLolo/lvls/";
 
-bool Game::canMoveLeft(Personages *p)
+bool Game::wasHeartPicked()
 {
-    if (p->stepLeftRight == 3)
-        return (true);
-    if (this->map[p->y * this->width + p->x - 1].ptr)
-    {
-        if (!(this->map[p->y * this->width + p->x - 1].ptr->isWalkable()))
-            return (false);
-    }
-    if (this->map[(p->y - 1) * this->width + p->x - 1].ptr)
-    {
-        if (p->stepUpDown == 12 &&
-                !(this->map[(p->y - 1) * this->width + p->x - 1].ptr->isWalkable()))
-            return (false);
-    }
-    if (this->map[(p->y + 1) * this->width + p->x - 1].ptr)
-    {
-        if (p->stepUpDown == 6 &&
-                !(this->map[(p->y + 1) * this->width + p->x - 1].ptr->isWalkable()))
-            return (false);
-    }
-    return (true);
+    return this->heartPicked;
 }
 
-bool Game::canMoveRight(Personages *p)
+void Game::setHeartPickedStatus(bool picked)
 {
-    if (p->stepLeftRight == 9)
-        return (true);
-    if (this->map[p->y * this->width + p->x + 1].ptr)
-    {
-        if (!(this->map[p->y * this->width + p->x + 1].ptr->isWalkable()))
-            return (false);
-    }
-    if (this->map[(p->y - 1) * this->width + p->x + 1].ptr)
-    {
-        if (p->stepUpDown == 12 &&
-                !(this->map[(p->y - 1) * this->width + p->x + 1].ptr->isWalkable()))
-            return (false);
-    }
-    if (this->map[(p->y + 1) * this->width + p->x + 1].ptr)
-    {
-        if (p->stepUpDown == 6 &&
-                !(this->map[(p->y + 1) * this->width + p->x + 1].ptr->isWalkable()))
-            return (false);
-    }
-    return (true);
+    this->heartPicked = picked;
 }
 
-bool Game::canMoveUp(Personages *p)
-{
-    if (p->stepUpDown == 6)
-        return (true);
-    if (this->map[(p->y - 1) * this->width + p->x].ptr)
-    {
-                    qDebug() << (p->y - 1) * this->width + p->x;
-        if (!(this->map[(p->y - 1) * this->width + p->x].ptr->isWalkable()))
-            return (false);
-    }
-    if (this->map[(p->y - 1) * this->width + (p->x + 1)].ptr)
-    {
-        if (p->stepLeftRight == 3 &&
-                !(this->map[(p->y - 1) * this->width + (p->x + 1)].ptr->isWalkable()))
-            return (false);
-    }
-    if (this->map[(p->y - 1) * this->width + (p->x - 1)].ptr)
-    {
-        if (p->stepLeftRight == 9 &&
-                !(this->map[(p->y - 1) * this->width + (p->x - 1)].ptr->isWalkable()))
-            return (false);
-    }
-    return (true);
-}
-
-bool Game::canMoveDown(Personages *p)
-{
-    if (p->stepUpDown == 12)
-        return (true);
-    if (this->map[(p->y + 1) * this->width + p->x].ptr)
-    {
-        if (!(this->map[(p->y + 1) * this->width + p->x].ptr->isWalkable()))
-            return (false);
-    }
-    if (this->map[(p->y + 1) * this->width + (p->x + 1)].ptr)
-    {
-        if (p->stepLeftRight == 3 &&
-                !(this->map[(p->y + 1) * this->width + (p->x + 1)].ptr->isWalkable()))
-            return (false);
-    }
-    if (this->map[(p->y + 1) * this->width + (p->x - 1)].ptr)
-    {
-        if (p->stepLeftRight == 9 &&
-                !(this->map[(p->y + 1) * this->width + (p->x - 1)].ptr->isWalkable()))
-            return (false);
-    }
-    return (true);
-}
-
-Game::Game(std::string fileName)
+Game::Game(std::string fileName) : heartPicked{false}
 {
     std::ifstream   file;
     int    x = 0;
@@ -119,8 +27,6 @@ Game::Game(std::string fileName)
     file.open(LVL_PATH + fileName);
     file >> x >> y;
     this->map = new Game::cell[static_cast<unsigned int>(x * y)];
-    this->height = y;
-    this->width = x;
     for (int i = 0; i < y; i++)
         for (int j = 0; j < x; j++)
         {
@@ -165,15 +71,9 @@ Game::Game(std::string fileName)
             }
             case 'H':
             {
-                this->map[i * x + j].ptr = static_cast<Objects*>(new Heart(true, true, 2));
+                this->map[i * x + j].ptr = static_cast<Objects*>(new Heart(true, true));
                 this->map[i * x + j].typeOfSthElse = 'h';
-                this->map[i * x + j].imgName = "heart";
-                break;
-            }
-            case 'h':
-            {
-                this->map[i * x + j].ptr = static_cast<Objects*>(new Heart(true, true, 0));
-                this->map[i * x + j].typeOfSthElse = 'h';
+                qDebug() << this->map[i * x + j].ptr << static_cast<Heart*>(this->map[i * x + j].ptr);
                 this->map[i * x + j].imgName = "heart";
                 break;
             }
@@ -206,7 +106,7 @@ Game::Game(std::string fileName)
 
 Game::~Game()
 {
-    for (unsigned int i = 0; i < this->height * this->width; i++)
+    for (unsigned int i = 0; i < HEIGHT * WIDTH; i++)
         if (this->map[i].ptr)
             operator delete (this->map[i].ptr);
     delete map;

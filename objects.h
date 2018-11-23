@@ -1,5 +1,7 @@
 #ifndef OBJECTS_H
 #define OBJECTS_H
+#define HEIGHT 13
+#define WIDTH 13
 
 class Objects
 {
