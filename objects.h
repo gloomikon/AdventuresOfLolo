@@ -20,6 +20,8 @@ public:
     bool        isWalkable();
     void        setImgName(std::string imgName);
     std::string getImgName();
+
+    virtual ~Objects() = default;
 };
 
 #endif // OBJECTS_H

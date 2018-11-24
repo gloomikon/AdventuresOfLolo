@@ -20,8 +20,15 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     this->setAttribute(Qt::WA_OpaquePaintEvent);
     this->setWindowTitle("Adventures of Lolo by KOLUMBIA");
     this->game = new Game("level1.txt");
+    this->game->getLolo()->setTimer(new QTimer(this));
+    connect(this->game->getLolo()->getTimer(), SIGNAL(timeout()), this, SLOT(shooting()));
     this->timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(ex_code()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(moving()));
+}
+
+Game *Widget::getGame()
+{
+    return this->game;
 }
 
 void Widget::drawSurface()
@@ -37,15 +44,15 @@ void Widget::drawSurface()
                            (j + 1) * 128,
                            (i + 1) * 128);
             std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-            path += this->game->map[i * WIDTH + j].typeOfSurface;
+            path += this->game->getMap()[i * WIDTH + j].typeOfSurface;
             path += ".png";
             QPixmap pixmap(path.c_str());
             painter.drawPixmap(rect, pixmap);
-            if (this->game->map[i * WIDTH + j].ptr && this->game->map[i * WIDTH + j].typeOfSthElse != 'b'
-                     && this->game->map[i * WIDTH + j].typeOfSthElse != 'l')
+            if (this->game->getMap()[i * WIDTH + j].ptr && this->game->getMap()[i * WIDTH + j].typeOfSthElse != 'b'
+                     && this->game->getMap()[i * WIDTH + j].typeOfSthElse != 'l')
             {
                 path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-                path += this->game->map[i * WIDTH + j].ptr->getImgName();
+                path += this->game->getMap()[i * WIDTH + j].ptr->getImgName();
                 path += ".png";
                 QPixmap pixmap(path.c_str());
                 painter.drawPixmap(rect, pixmap);
@@ -55,7 +62,7 @@ void Widget::drawSurface()
 void Widget::drawLolo()
 {
     QPainter painter(this);
-    painter.drawPixmap(this->game->lolo->getRect(), this->game->lolo->getPixmap());
+    painter.drawPixmap(this->game->getLolo()->getRect(), this->game->getLolo()->getPixmap());
 }
 void Widget::drawObjects()
 {
@@ -65,19 +72,36 @@ void Widget::drawObjects()
     for (int i = 0; i < HEIGHT; i++)
         for (int j = 0; j < WIDTH; j++)
         {
-            if (this->game->map[i * WIDTH + j].typeOfSthElse == 'b')
+            if (this->game->getMap()[i * WIDTH + j].typeOfSthElse == 'b')
             {
                 rect.setCoords(j * 128,
                                i * 128,
                                (j + 1) * 128,
                                (i + 1) * 128);
                 std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-                path += this->game->map[i * WIDTH + j].ptr->getImgName();
+                path += this->game->getMap()[i * WIDTH + j].ptr->getImgName();
                 path += ".png";
                 QPixmap pixmap(path.c_str());
                 painter.drawPixmap(rect, pixmap);
             }
         }
+}
+
+void Widget::drawShoots()
+{
+    QPainter painter(this);
+
+    for (int i = 0; i < HEIGHT; i++)
+        for (int j = 0; j < WIDTH; j++)
+        {
+            if (dynamic_cast<Personages*>(this->game->getMap()[i * WIDTH + j].ptr) &&
+                    dynamic_cast<Personages*>(this->game->getMap()[i * WIDTH + j].ptr)->madeShoot())
+            {
+                painter.drawPixmap(static_cast<Personages*>(this->game->getMap()[i * WIDTH + j].ptr)->getSImage().rect,
+                        static_cast<Personages*>(this->game->getMap()[i * WIDTH + j].ptr)->getSImage().pixmap);
+            }
+        }
+    update();
 }
 
 void Widget::updBg(Personages *p)
@@ -92,20 +116,20 @@ void Widget::updBg(Personages *p)
                            (p->getCoords().x + i + 1) * 128,
                            (p->getCoords().y + j + 1) * 128);
             std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-            path += this->game->map[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].typeOfSurface;
+            path += this->game->getMap()[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].typeOfSurface;
             path += ".png";
             QPixmap pixmap(path.c_str());
             painter.drawPixmap(rect, pixmap);        
 
-            if (this->game->map[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].ptr &&
-                    this->game->map[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].ptr != p)
+            if (this->game->getMap()[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].ptr &&
+                    this->game->getMap()[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].ptr != p)
             {
                 rect.setCoords((p->getCoords().x + i) * 128,
                                (p->getCoords().y + j) * 128,
                                (p->getCoords().x + i + 1) * 128,
                                (p->getCoords().y + j + 1) * 128);
                 std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-                path += this->game->map[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].ptr->getImgName();
+                path += this->game->getMap()[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].ptr->getImgName();
                 path += ".png";
                 QPixmap pixmap(path.c_str());
                 painter.drawPixmap(rect, pixmap);
@@ -118,38 +142,38 @@ void Widget::paintEvent(QPaintEvent *)
     if (!drawed)
     {
         this->drawSurface();
-        this->drawObjects();
         drawed = true;
     }
     else
     {
-        this->updBg(this->game->lolo);
+        this->updBg(this->game->getLolo());
     }
+    this->drawObjects();
     this->drawLolo();
+    this->drawShoots();
 }
 
-void Widget::ex_code()
+void Widget::moving()
 {
-
     //Down
-    if (this->game->lolo->getDirection() == 6)
+    if (this->game->getLolo()->getDirection() == 6)
     {
-        this->game->lolo->moveDown(this->game, this->timer);
+        this->game->getLolo()->moveDown(this->game, this->timer);
     }
     //Up
-    if (this->game->lolo->getDirection() == 12)
+    else if (this->game->getLolo()->getDirection() == 12)
     {
-        this->game->lolo->moveUp(this->game, this->timer);
+        this->game->getLolo()->moveUp(this->game, this->timer);
     }
     //Left
-    if (this->game->lolo->getDirection() == 9)
+    else if (this->game->getLolo()->getDirection() == 9)
     {
-        this->game->lolo->moveLeft(this->game, this->timer);
+        this->game->getLolo()->moveLeft(this->game, this->timer);
     }
     //Right
-    if (this->game->lolo->getDirection() == 3)
+    else if (this->game->getLolo()->getDirection() == 3)
     {
-        this->game->lolo->moveRight(this->game, this->timer);
+        this->game->getLolo()->moveRight(this->game, this->timer);
     }
     /*if (this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].typeOfSthElse == 'h')
     {
@@ -168,35 +192,78 @@ void Widget::ex_code()
     }*/
     update();
 }
+
+void Widget::shooting()
+{
+    //Up
+    if (this->game->getLolo()->getShootDirection() == 12)
+    {
+        this->game->getLolo()->shootUp(this->game);
+    }
+    //Down
+    else if (this->game->getLolo()->getShootDirection() == 6)
+    {
+        this->game->getLolo()->shootDown(this->game);
+    }
+    //Right
+    else if (this->game->getLolo()->getShootDirection() == 3)
+    {
+        this->game->getLolo()->shootRight(this->game);
+    }
+    //Left
+    else if (this->game->getLolo()->getShootDirection() == 9)
+    {
+        this->game->getLolo()->shootLeft(this->game);
+    }
+}
 void Widget::keyPressEvent(QKeyEvent *e)
 {
-    if (!(this->timer->isActive()))
-    {
+
         if (e->key() == Qt::Key_S || e->key() == Qt::Key_Down)
         {
-            this->game->lolo->setImgName("lolo");
-            this->game->lolo->setDirection(6);
-            timer->start(10);
+            if (!this->timer->isActive())
+            {
+                this->game->getLolo()->setImgName("lolo");
+                this->game->getLolo()->setDirection(6);
+                this->timer->start(10);
+            }
         }
         else if (e->key() == Qt::Key_W || e->key() == Qt::Key_Up)
         {
-            this->game->lolo->setImgName("loloup");
-            this->game->lolo->setDirection(12);
-            timer->start(10);
+            if (!this->timer->isActive())
+            {
+                this->game->getLolo()->setImgName("loloup");
+                this->game->getLolo()->setDirection(12);
+                this->timer->start(10);
+            }
         }
         else if (e->key() == Qt::Key_A || e->key() == Qt::Key_Left)
         {
-            this->game->lolo->setImgName("lololeft");
-            this->game->lolo->setDirection(9);
-            this->timer->start(10);
+            if (!this->timer->isActive())
+            {
+                this->game->getLolo()->setImgName("lololeft");
+                this->game->getLolo()->setDirection(9);
+                this->timer->start(10);
+            }
         }
         else if (e->key() == Qt::Key_D || e->key() == Qt::Key_Right)
         {
-            this->game->lolo->setImgName("loloright");
-            this->game->lolo->setDirection(3);
-            this->timer->start(10);
+            if (!this->timer->isActive())
+            {
+                this->game->getLolo()->setImgName("loloright");
+                this->game->getLolo()->setDirection(3);
+                this->timer->start(10);
+            }
         }
-    }
+
+        else if (e->key() == Qt::Key_Space)
+        {
+            if (!this->game->getLolo()->getTimer()->isActive())
+            {
+                this->game->getLolo()->setShootDirection(this->game->getLolo()->getDirection());
+                this->game->getLolo()->getTimer()->start(10);
+            }
+        }
 }
 Widget::~Widget()
 {

@@ -5,7 +5,9 @@
 # include <QPixmap>
 # include <QTimer>
 
+
 class Game;
+class Widget;
 
 class Personages : public Objects
 {
@@ -21,18 +23,29 @@ private:
         int stepUpDown;
         int stepLeftRight;
     };
+    struct Image
+    {
+        QRect   rect;
+        QPixmap pixmap;
+    };
 
+    bool        alive;
+    bool        shoot;
     Coords      coords;
     Steps       steps;
     int         direction;
-    QRect       rect;
-    QPixmap     pixmap;
+    int         shootDirection;
+    Image       pImage;
+    Image       sImage;
+    QTimer      *timer;
 
 protected:
 public:
 
 
     Personages(bool shootable, int x, int y, int direction, QRect rect, QPixmap pixmap, std::string imgName);
+
+    bool            madeShoot();
 
     bool            canMoveLeft(Game *game);
     bool            canMoveRight(Game *game);
@@ -44,6 +57,13 @@ public:
     void            moveUp(Game *game, QTimer *timer);
     void            moveDown(Game *game, QTimer *timer);
 
+    int             shooted(Game *game, int x, int y);
+
+    void            shootUp(Game *game);
+    void            shootDown(Game *game);
+    void            shootRight(Game *game);
+    void            shootLeft(Game *game);
+
 
     Coords          getCoords();
     void            setCoords(int x, int y);
@@ -54,9 +74,17 @@ public:
     int             getDirection();
     void            setDirection(int direction);
 
+    int             getShootDirection();
+    void            setShootDirection(int shootDirection);
+
     QRect           getRect();
 
     QPixmap         getPixmap();
+
+    QTimer          *getTimer();
+    void            setTimer(QTimer *timer);
+
+    Image           getSImage();
 
 };
 

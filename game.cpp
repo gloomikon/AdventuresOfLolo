@@ -108,6 +108,16 @@ Game::Game(std::string fileName) : heartPicked{false}
     file.close();
 }
 
+Game::cell *Game::getMap()
+{
+    return this->map;
+}
+
+Lolo *Game::getLolo()
+{
+    return this->lolo;
+}
+
 
 Game::~Game()
 {

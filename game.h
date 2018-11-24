@@ -14,16 +14,20 @@ private:
         char        typeOfSurface;
         char        typeOfSthElse;
     };
+
     bool    heartPicked;
     int     lives;
-public:
     cell    *map;
     Lolo    *lolo;
+public:
 
     bool            wasHeartPicked();
     void            setHeartPickedStatus(bool picked);
 
     Game(std::string fileName);
+
+    cell    *getMap();
+    Lolo    *getLolo();
     ~Game();
 };
 

@@ -13,23 +13,27 @@ class Widget : public QWidget
 {
     Q_OBJECT
 
-public:
-    explicit Widget(QWidget *parent = nullptr);
-    ~Widget();
-
-     QTimer          *timer;
 public slots:
-    void        ex_code();
+    void        moving();
+    void        shooting();
+
 private:
     Ui::Widget  *ui;
     Game        *game;
     void        drawSurface();
     void        drawObjects();
+    void        drawShoots();
     void        updBg(Personages *p);
     void        drawLolo();
+    QTimer      *timer;
 protected:
     void    paintEvent(QPaintEvent *);
     void    keyPressEvent(QKeyEvent *);
+public:
+    explicit Widget(QWidget *parent = nullptr);
+    Game    *getGame();
+    ~Widget();
+
 
 };
 
