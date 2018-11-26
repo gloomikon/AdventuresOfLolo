@@ -64,10 +64,10 @@ public:
 
     int             shooted(Game *game, int x, int y);
 
-    void            shootUp(Game *game);
-    void            shootDown(Game *game);
-    void            shootRight(Game *game);
-    void            shootLeft(Game *game);
+    void            shootUp();
+    void            shootDown();
+    void            shootRight();
+    void            shootLeft();
 
 
     Coords          getCoords();
@@ -92,6 +92,8 @@ public:
 
     void            createShoot();
     Shoot           *getShoot();
+
+    void            setBoolShoot(bool shoot);
 
 };
 

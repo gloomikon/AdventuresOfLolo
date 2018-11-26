@@ -559,7 +559,7 @@ int Personages::shooted(Game *game, int x, int y)
     return 0;
 }
 
-void Personages::shootUp(Game *game)
+void Personages::shootUp()
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -581,12 +581,6 @@ void Personages::shootUp(Game *game)
     }
     {
         this->pShoot->image.rect.getCoords(x1, y1, x2, y2);
-        if (shooted(game, this->pShoot->coords.x, this->pShoot->coords.y))
-        {
-            this->timer->stop();
-            this->shoot = false;
-        }
-        else
         {
             this->pShoot->image.rect.moveTop(*y1 - 16);
             steps+=16;
@@ -604,7 +598,7 @@ void Personages::shootUp(Game *game)
     delete y2;
 }
 
-void Personages::shootDown(Game *game)
+void Personages::shootDown()
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -625,13 +619,6 @@ void Personages::shootDown(Game *game)
         this->shoot = true;
     }
     this->pShoot->image.rect.getCoords(x1, y1, x2, y2);
-    if (shooted(game, this->pShoot->coords.x, this->pShoot->coords.y))
-    {
-        this->timer->stop();
-        this->shoot = false;
-        delete this->pShoot;
-    }
-    else
     {
         this->pShoot->image.rect.moveTop(*y1 + 16);
         steps+=16;
@@ -647,7 +634,7 @@ void Personages::shootDown(Game *game)
     delete y2;
 }
 
-void Personages::shootRight(Game *game)
+void Personages::shootRight()
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -669,13 +656,6 @@ void Personages::shootRight(Game *game)
     }
     {
         this->pShoot->image.rect.getCoords(x1, y1, x2, y2);
-        if (shooted(game, this->pShoot->coords.x, this->pShoot->coords.y))
-        {
-            this->timer->stop();
-            this->pShoot->image.pixmap = QPixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/lolo.png");
-            this->shoot = false;
-        }
-        else
         {
             this->pShoot->image.rect.moveLeft(*x1 + 16);
             steps+=16;
@@ -693,7 +673,7 @@ void Personages::shootRight(Game *game)
     delete y2;
 }
 
-void Personages::shootLeft(Game *game)
+void Personages::shootLeft()
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -715,12 +695,6 @@ void Personages::shootLeft(Game *game)
     }
     {
         this->pShoot->image.rect.getCoords(x1, y1, x2, y2);
-        if (shooted(game, this->pShoot->coords.x, this->pShoot->coords.y))
-        {
-            this->timer->stop();
-            this->shoot = false;
-        }
-        else
         {
             this->pShoot->image.rect.moveLeft(*x1 - 16);
             steps+=16;
@@ -808,4 +782,9 @@ void Personages::createShoot()
 Personages::Shoot *Personages::getShoot()
 {
     return this->pShoot;
+}
+
+void Personages::setBoolShoot(bool shoot)
+{
+    this->shoot = shoot;
 }
