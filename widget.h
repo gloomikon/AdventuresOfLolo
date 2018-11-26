@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <game.h>
 #include <QTimer>
+#include <QPainter>
 
 namespace Ui {
 class Widget;
@@ -20,10 +21,12 @@ public slots:
 private:
     Ui::Widget  *ui;
     Game        *game;
+    void        drawCell(int x, int y, Personages *p = nullptr);
     void        drawSurface();
     void        drawObjects();
     void        drawShoots();
     void        updBg(Personages *p);
+    void        updShootBg(Personages *p);
     void        drawLolo();
     QTimer      *timer;
 protected:

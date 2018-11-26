@@ -182,25 +182,33 @@ void Personages::moveLeft(Game *game, QTimer *timer)
             if (this->steps.stepLeftRight)
             {
                 if (this->steps.stepLeftRight == 9)
+                {
                     this->coords.x--;
-                game->getMap()[this->coords.y * WIDTH + this->coords.x + 1].isSome1Here = false;
-                if (this->steps.stepUpDown == 12)
-                    game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].isSome1Here = false;
-                if (this->steps.stepUpDown == 6)
-                    game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].isSome1Here = false;
-                game->getMap()[this->coords.y * WIDTH + this->coords.x].isSome1Here = true;
-                if (this->steps.stepUpDown == 12)
-                    game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].isSome1Here = true;
-                if (this->steps.stepUpDown == 6)
-                    game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].isSome1Here = true;
-                this->steps.stepLeftRight = 0;
+                    game->getMap()[this->coords.y * WIDTH + this->coords.x + 1].isSome1Here = false;
+                    if (this->steps.stepUpDown == 12)
+                        game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].isSome1Here = false;
+                    if (this->steps.stepUpDown == 6)
+                        game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].isSome1Here = false;
+                    game->getMap()[this->coords.y * WIDTH + this->coords.x].isSome1Here = true;
+                    if (this->steps.stepUpDown == 12)
+                        game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].isSome1Here = true;
+                    if (this->steps.stepUpDown == 6)
+                        game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].isSome1Here = true;
+
+                    if (game->getMap()[(this->coords.y) * WIDTH + this->coords.x + 1].ptr == this)
+                        game->getMap()[(this->coords.y) * WIDTH + this->coords.x + 1].ptr = nullptr;
+                    if (!game->getMap()[(this->coords.y) * WIDTH + this->coords.x].ptr)
+                        game->getMap()[(this->coords.y) * WIDTH + this->coords.x].ptr = this;
+                }
+                 this->steps.stepLeftRight = 0;
             }
-            else
-                this->steps.stepLeftRight = 9;
-            steps = 0;
-            timer->stop();
-        }
+
+        else
+            this->steps.stepLeftRight = 9;
+        steps = 0;
+        timer->stop();
     }
+                }
     else
         timer->stop();
     delete x1;
@@ -282,24 +290,32 @@ void Personages::moveRight(Game *game, QTimer *timer)
             if (this->steps.stepLeftRight)
             {
                 if (this->steps.stepLeftRight == 3)
+                {
                     this->coords.x++;
-                game->getMap()[this->coords.y * WIDTH + this->coords.x - 1].isSome1Here = false;
-                if (this->steps.stepUpDown == 12)
-                    game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].isSome1Here = false;
-                if (this->steps.stepUpDown == 6)
-                    game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].isSome1Here = false;
-                game->getMap()[this->coords.y * WIDTH + this->coords.x].isSome1Here = true;
-                if (this->steps.stepUpDown == 12)
-                    game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].isSome1Here = true;
-                if (this->steps.stepUpDown == 6)
-                    game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].isSome1Here = true;
+                    game->getMap()[this->coords.y * WIDTH + this->coords.x - 1].isSome1Here = false;
+                    if (this->steps.stepUpDown == 12)
+                        game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].isSome1Here = false;
+                    if (this->steps.stepUpDown == 6)
+                        game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].isSome1Here = false;
+                    game->getMap()[this->coords.y * WIDTH + this->coords.x].isSome1Here = true;
+                    if (this->steps.stepUpDown == 12)
+                        game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].isSome1Here = true;
+                    if (this->steps.stepUpDown == 6)
+                        game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].isSome1Here = true;
+
+
+                    if (game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 1].ptr == this)
+                        game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 1].ptr = nullptr;
+                    if (!game->getMap()[(this->coords.y) * WIDTH + this->coords.x].ptr)
+                        game->getMap()[(this->coords.y) * WIDTH + this->coords.x].ptr = this;
+                }
                 this->steps.stepLeftRight = 0;
             }
             else
                 this->steps.stepLeftRight = 3;
             steps = 0;
             timer->stop();
-        }
+    }
     }
     else
         timer->stop();
@@ -394,6 +410,11 @@ void Personages::moveUp(Game *game, QTimer *timer)
                     game->getMap()[this->coords.y * WIDTH + this->coords.x + 1].isSome1Here = true;
                 if (this->steps.stepLeftRight == 9)
                     game->getMap()[this->coords.y * WIDTH + this->coords.x - 1].isSome1Here = true;
+
+                if (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].ptr == this)
+                    game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].ptr = nullptr;
+                if (!game->getMap()[(this->coords.y) * WIDTH + this->coords.x].ptr)
+                    game->getMap()[(this->coords.y) * WIDTH + this->coords.x].ptr = this;
                 }
                 this->steps.stepUpDown = 0;
             }
@@ -498,6 +519,11 @@ void Personages::moveDown(Game *game, QTimer *timer)
                     game->getMap()[this->coords.y * WIDTH + this->coords.x + 1].isSome1Here = true;
                 if (this->steps.stepLeftRight == 9)
                     game->getMap()[this->coords.y * WIDTH + this->coords.x - 1].isSome1Here = true;
+
+                if (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].ptr == this)
+                    game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].ptr = nullptr;
+                if (!game->getMap()[(this->coords.y) * WIDTH + this->coords.x].ptr)
+                    game->getMap()[(this->coords.y) * WIDTH + this->coords.x].ptr = this;
                 }
                 this->steps.stepUpDown = 0;
             }
@@ -535,9 +561,6 @@ int Personages::shooted(Game *game, int x, int y)
 
 void Personages::shootUp(Game *game)
 {
-    static int x;
-    static int y;
-
     int *x1 = new int;
     int *y1 = new int;
     int *x2 = new int;
@@ -547,29 +570,29 @@ void Personages::shootUp(Game *game)
 
     if (!this->shoot)
     {
-        x = this->coords.x;
-        y = this->coords.y;
-        this->sImage.rect.setCoords(x  * 128,
-                                    y * 128,
-                                   (x + 1) * 128,
-                                   (y + 1) * 128);
-        this->sImage.pixmap = QPixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/bulletup.png");
+        this->pShoot->coords.x = this->coords.x;
+        this->pShoot->coords.y = this->coords.y;
+        this->pShoot->image.rect.setCoords(this->pShoot->coords.x  * 128,
+                                           this->pShoot->coords.y * 128,
+                                           (this->pShoot->coords.x + 1) * 128,
+                                           (this->pShoot->coords.y + 1) * 128);
+        this->pShoot->image.pixmap = QPixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/bulletup.png");
         this->shoot = true;
     }
     {
-        this->sImage.rect.getCoords(x1, y1, x2, y2);
-        if (shooted(game, x, y))
+        this->pShoot->image.rect.getCoords(x1, y1, x2, y2);
+        if (shooted(game, this->pShoot->coords.x, this->pShoot->coords.y))
         {
             this->timer->stop();
             this->shoot = false;
         }
         else
         {
-            this->sImage.rect.moveTop(*y1 - 16);
+            this->pShoot->image.rect.moveTop(*y1 - 16);
             steps+=16;
             if (steps == 128)
             {
-                y--;
+                this->pShoot->coords.y--;
                 steps = 0;
             }
         }
@@ -583,9 +606,6 @@ void Personages::shootUp(Game *game)
 
 void Personages::shootDown(Game *game)
 {
-    static int x;
-    static int y;
-
     int *x1 = new int;
     int *y1 = new int;
     int *x2 = new int;
@@ -595,33 +615,31 @@ void Personages::shootDown(Game *game)
 
     if (!this->shoot)
     {
-        x = this->coords.x;
-        y = this->coords.y;
-        this->sImage.rect.setCoords(x  * 128,
-                                    y * 128,
-                                   (x + 1) * 128,
-                                   (y + 1) * 128);
-        this->sImage.pixmap = QPixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/bulletdown.png");
+        this->pShoot->coords.x = this->coords.x;
+        this->pShoot->coords.y = this->coords.y;
+        this->pShoot->image.rect.setCoords(this->pShoot->coords.x  * 128,
+                                           this->pShoot->coords.y * 128,
+                                           (this->pShoot->coords.x + 1) * 128,
+                                           (this->pShoot->coords.y + 1) * 128);
+        this->pShoot->image.pixmap = QPixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/bulletdown.png");
         this->shoot = true;
     }
+    this->pShoot->image.rect.getCoords(x1, y1, x2, y2);
+    if (shooted(game, this->pShoot->coords.x, this->pShoot->coords.y))
     {
-        this->sImage.rect.getCoords(x1, y1, x2, y2);
-        if (shooted(game, x, y))
+        this->timer->stop();
+        this->shoot = false;
+        delete this->pShoot;
+    }
+    else
+    {
+        this->pShoot->image.rect.moveTop(*y1 + 16);
+        steps+=16;
+        if (steps == 128)
         {
-            this->timer->stop();
-            this->shoot = false;
+            this->pShoot->coords.y++;
+            steps = 0;
         }
-        else
-        {
-            this->sImage.rect.moveTop(*y1 + 16);
-            steps+=16;
-            if (steps == 128)
-            {
-                y++;
-                steps = 0;
-            }
-        }
-
     }
     delete x1;
     delete x2;
@@ -631,9 +649,6 @@ void Personages::shootDown(Game *game)
 
 void Personages::shootRight(Game *game)
 {
-    static int x;
-    static int y;
-
     int *x1 = new int;
     int *y1 = new int;
     int *x2 = new int;
@@ -643,29 +658,30 @@ void Personages::shootRight(Game *game)
 
     if (!this->shoot)
     {
-        x = this->coords.x;
-        y = this->coords.y;
-        this->sImage.rect.setCoords(x  * 128,
-                                    y * 128,
-                                   (x + 1) * 128,
-                                   (y + 1) * 128);
-        this->sImage.pixmap = QPixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/bulletright.png");
+        this->pShoot->coords.x = this->coords.x;
+        this->pShoot->coords.y = this->coords.y;
+        this->pShoot->image.rect.setCoords(this->pShoot->coords.x  * 128,
+                                           this->pShoot->coords.y * 128,
+                                           (this->pShoot->coords.x + 1) * 128,
+                                           (this->pShoot->coords.y + 1) * 128);
+        this->pShoot->image.pixmap = QPixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/bulletright.png");
         this->shoot = true;
     }
     {
-        this->sImage.rect.getCoords(x1, y1, x2, y2);
-        if (shooted(game, x, y))
+        this->pShoot->image.rect.getCoords(x1, y1, x2, y2);
+        if (shooted(game, this->pShoot->coords.x, this->pShoot->coords.y))
         {
             this->timer->stop();
+            this->pShoot->image.pixmap = QPixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/lolo.png");
             this->shoot = false;
         }
         else
         {
-            this->sImage.rect.moveLeft(*x1 + 16);
+            this->pShoot->image.rect.moveLeft(*x1 + 16);
             steps+=16;
             if (steps == 128)
             {
-                x++;
+                this->pShoot->coords.x++;
                 steps = 0;
             }
         }
@@ -679,9 +695,6 @@ void Personages::shootRight(Game *game)
 
 void Personages::shootLeft(Game *game)
 {
-    static int x;
-    static int y;
-
     int *x1 = new int;
     int *y1 = new int;
     int *x2 = new int;
@@ -691,29 +704,29 @@ void Personages::shootLeft(Game *game)
 
     if (!this->shoot)
     {
-        x = this->coords.x;
-        y = this->coords.y;
-        this->sImage.rect.setCoords(x  * 128,
-                                    y * 128,
-                                   (x + 1) * 128,
-                                   (y + 1) * 128);
-        this->sImage.pixmap = QPixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/bulletleft.png");
+        this->pShoot->coords.x = this->coords.x;
+        this->pShoot->coords.y = this->coords.y;
+        this->pShoot->image.rect.setCoords(this->pShoot->coords.x  * 128,
+                                           this->pShoot->coords.y * 128,
+                                           (this->pShoot->coords.x + 1) * 128,
+                                           (this->pShoot->coords.y + 1) * 128);
+        this->pShoot->image.pixmap = QPixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/bulletleft.png");
         this->shoot = true;
     }
     {
-        this->sImage.rect.getCoords(x1, y1, x2, y2);
-        if (shooted(game, x, y))
+        this->pShoot->image.rect.getCoords(x1, y1, x2, y2);
+        if (shooted(game, this->pShoot->coords.x, this->pShoot->coords.y))
         {
             this->timer->stop();
             this->shoot = false;
         }
         else
         {
-            this->sImage.rect.moveLeft(*x1 - 16);
+            this->pShoot->image.rect.moveLeft(*x1 - 16);
             steps+=16;
             if (steps == 128)
             {
-                x--;
+                this->pShoot->coords.x--;
                 steps = 0;
             }
         }
@@ -751,15 +764,11 @@ void Personages::setDirection(int direction)
     this->direction = direction;
 }
 
-int Personages::getShootDirection()
-{
-    return  this->shootDirection;
-}
-
 void Personages::setShootDirection(int shootDirection)
 {
-    this->shootDirection = shootDirection;
+    this->pShoot->direction = shootDirection;
 }
+
 
 QRect Personages::getRect()
 {
@@ -788,5 +797,15 @@ void Personages::setTimer(QTimer *timer)
 
 Personages::Image Personages::getSImage()
 {
-    return this->sImage;
+    return this->pShoot->image;
+}
+
+void Personages::createShoot()
+{
+    this->pShoot = new (Shoot);
+}
+
+Personages::Shoot *Personages::getShoot()
+{
+    return this->pShoot;
 }

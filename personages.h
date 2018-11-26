@@ -28,15 +28,20 @@ private:
         QRect   rect;
         QPixmap pixmap;
     };
+    struct Shoot
+    {
+        Coords  coords;
+        Image   image;
+        int     direction;
+    };
 
     bool        alive;
     bool        shoot;
     Coords      coords;
     Steps       steps;
     int         direction;
-    int         shootDirection;
     Image       pImage;
-    Image       sImage;
+    Shoot       *pShoot;
     QTimer      *timer;
 
 protected:
@@ -74,7 +79,6 @@ public:
     int             getDirection();
     void            setDirection(int direction);
 
-    int             getShootDirection();
     void            setShootDirection(int shootDirection);
 
     QRect           getRect();
@@ -85,6 +89,9 @@ public:
     void            setTimer(QTimer *timer);
 
     Image           getSImage();
+
+    void            createShoot();
+    Shoot           *getShoot();
 
 };
 

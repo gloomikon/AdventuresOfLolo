@@ -33,30 +33,10 @@ Game *Widget::getGame()
 
 void Widget::drawSurface()
 {
-    QPainter painter(this);
-    QRect rect;
-
     for (int i = 0; i < HEIGHT; i++)
         for (int j = 0; j < WIDTH; j++)
         {
-            rect.setCoords(j * 128,
-                           i * 128,
-                           (j + 1) * 128,
-                           (i + 1) * 128);
-            std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-            path += this->game->getMap()[i * WIDTH + j].typeOfSurface;
-            path += ".png";
-            QPixmap pixmap(path.c_str());
-            painter.drawPixmap(rect, pixmap);
-            if (this->game->getMap()[i * WIDTH + j].ptr && this->game->getMap()[i * WIDTH + j].typeOfSthElse != 'b'
-                     && this->game->getMap()[i * WIDTH + j].typeOfSthElse != 'l')
-            {
-                path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-                path += this->game->getMap()[i * WIDTH + j].ptr->getImgName();
-                path += ".png";
-                QPixmap pixmap(path.c_str());
-                painter.drawPixmap(rect, pixmap);
-            }
+            this->drawCell(j,i);
         }
 }
 void Widget::drawLolo()
@@ -66,23 +46,12 @@ void Widget::drawLolo()
 }
 void Widget::drawObjects()
 {
-    QPainter painter(this);
-    QRect rect;
-
     for (int i = 0; i < HEIGHT; i++)
         for (int j = 0; j < WIDTH; j++)
         {
             if (this->game->getMap()[i * WIDTH + j].typeOfSthElse == 'b')
             {
-                rect.setCoords(j * 128,
-                               i * 128,
-                               (j + 1) * 128,
-                               (i + 1) * 128);
-                std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-                path += this->game->getMap()[i * WIDTH + j].ptr->getImgName();
-                path += ".png";
-                QPixmap pixmap(path.c_str());
-                painter.drawPixmap(rect, pixmap);
+                this->drawCell(j,i);
             }
         }
 }
@@ -97,6 +66,34 @@ void Widget::drawShoots()
             if (dynamic_cast<Personages*>(this->game->getMap()[i * WIDTH + j].ptr) &&
                     dynamic_cast<Personages*>(this->game->getMap()[i * WIDTH + j].ptr)->madeShoot())
             {
+                QPainter painter(this);
+                QRect rect;
+                Personages *p = dynamic_cast<Personages*>(this->game->getMap()[i * WIDTH + j].ptr);
+                int x = p->getShoot()->coords.x;
+                int y = p->getShoot()->coords.y;
+                std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
+                path += this->game->getMap()[y * WIDTH + x].typeOfSurface;
+                path += ".png";
+                QPixmap pixmap(path.c_str());
+                rect.setCoords(x * 128,
+                               y * 128,
+                               (x + 1) * 128,
+                               (y + 1) * 128);
+                painter.drawPixmap(rect, pixmap);
+                if (this->game->getMap()[y * WIDTH + x].ptr)
+                {
+                    if (dynamic_cast<Personages*>(this->game->getMap()[y * WIDTH + x].ptr))
+                        painter.drawPixmap(dynamic_cast<Personages*>(this->game->getMap()[y * WIDTH + x].ptr)->getRect(),
+                                dynamic_cast<Personages*>(this->game->getMap()[y * WIDTH + x].ptr)->getPixmap());
+                    else
+                    {
+                        std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
+                        path += this->game->getMap()[y * WIDTH + x].ptr->getImgName();
+                        path += ".png";
+                        QPixmap pixmap(path.c_str());
+                        painter.drawPixmap(rect, pixmap);
+                    }
+                }
                 painter.drawPixmap(static_cast<Personages*>(this->game->getMap()[i * WIDTH + j].ptr)->getSImage().rect,
                         static_cast<Personages*>(this->game->getMap()[i * WIDTH + j].ptr)->getSImage().pixmap);
             }
@@ -106,35 +103,16 @@ void Widget::drawShoots()
 
 void Widget::updBg(Personages *p)
 {
-    QPainter painter(this);
-    QRect rect;
     for (int i = -1; i < 2; i++)
         for (int j = -1; j < 2; j++)
         {
-            rect.setCoords((p->getCoords().x + i) * 128,
-                           (p->getCoords().y + j) * 128,
-                           (p->getCoords().x + i + 1) * 128,
-                           (p->getCoords().y + j + 1) * 128);
-            std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-            path += this->game->getMap()[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].typeOfSurface;
-            path += ".png";
-            QPixmap pixmap(path.c_str());
-            painter.drawPixmap(rect, pixmap);        
-
-            if (this->game->getMap()[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].ptr &&
-                    this->game->getMap()[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].ptr != p)
-            {
-                rect.setCoords((p->getCoords().x + i) * 128,
-                               (p->getCoords().y + j) * 128,
-                               (p->getCoords().x + i + 1) * 128,
-                               (p->getCoords().y + j + 1) * 128);
-                std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-                path += this->game->getMap()[(p->getCoords().y + j) * WIDTH + p->getCoords().x + i].ptr->getImgName();
-                path += ".png";
-                QPixmap pixmap(path.c_str());
-                painter.drawPixmap(rect, pixmap);
-            }
+            this->drawCell(p->getCoords().x + j, p->getCoords().y + i, p);
         }
+}
+
+void Widget::updShootBg(Personages *p)
+{
+
 }
 void Widget::paintEvent(QPaintEvent *)
 {
@@ -144,10 +122,7 @@ void Widget::paintEvent(QPaintEvent *)
         this->drawSurface();
         drawed = true;
     }
-    else
-    {
-        this->updBg(this->game->getLolo());
-    }
+    this->updBg(this->game->getLolo());
     this->drawObjects();
     this->drawLolo();
     this->drawShoots();
@@ -196,24 +171,47 @@ void Widget::moving()
 void Widget::shooting()
 {
     //Up
-    if (this->game->getLolo()->getShootDirection() == 12)
+    if (this->game->getLolo()->getShoot()->direction == 12)
     {
         this->game->getLolo()->shootUp(this->game);
     }
     //Down
-    else if (this->game->getLolo()->getShootDirection() == 6)
+    else if (this->game->getLolo()->getShoot()->direction == 6)
     {
         this->game->getLolo()->shootDown(this->game);
     }
     //Right
-    else if (this->game->getLolo()->getShootDirection() == 3)
+    else if (this->game->getLolo()->getShoot()->direction == 3)
     {
         this->game->getLolo()->shootRight(this->game);
     }
     //Left
-    else if (this->game->getLolo()->getShootDirection() == 9)
+    else if (this->game->getLolo()->getShoot()->direction == 9)
     {
         this->game->getLolo()->shootLeft(this->game);
+    }
+}
+
+void Widget::drawCell(int x, int y, Personages *p)
+{
+    QPainter painter(this);
+    QRect rect;
+    std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
+    path += this->game->getMap()[y * WIDTH + x].typeOfSurface;
+    path += ".png";
+    QPixmap pixmap(path.c_str());
+    rect.setCoords(x * 128,
+                   y * 128,
+                   (x + 1) * 128,
+                   (y + 1) * 128);
+    painter.drawPixmap(rect, pixmap);
+    if (this->game->getMap()[y * WIDTH + x].ptr && this->game->getMap()[y * WIDTH + x].ptr != static_cast<Objects*>(p))
+    {
+        std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
+        path += this->game->getMap()[y * WIDTH + x].ptr->getImgName();
+        path += ".png";
+        QPixmap pixmap(path.c_str());
+        painter.drawPixmap(rect, pixmap);
     }
 }
 void Widget::keyPressEvent(QKeyEvent *e)
@@ -260,6 +258,7 @@ void Widget::keyPressEvent(QKeyEvent *e)
         {
             if (!this->game->getLolo()->getTimer()->isActive())
             {
+                this->game->getLolo()->createShoot();
                 this->game->getLolo()->setShootDirection(this->game->getLolo()->getDirection());
                 this->game->getLolo()->getTimer()->start(10);
             }
