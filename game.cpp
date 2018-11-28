@@ -32,31 +32,28 @@ Game::Game(std::string fileName) : heartPicked{false}
         {
             file >> c;
             this->map[i * x + j].typeOfSurface = 'f';
-            this->map[i * x + j].typeOfSthElse = c;
+            this->map[i * x + j].objPtr = nullptr;
+            this->map[i * x + j].perPtr = nullptr;
             switch (c)
             {
             case '.':
             {
-               this->map[i * x + j].ptr = new Objects(false, false, "wall");
-               this->map[i * x + j].typeOfSthElse = 'w';
+               this->map[i * x + j].objPtr = new Objects(false, false, "wall");
                break;
             }
             case 'E':
             {
-               this->map[i * x + j].ptr = new Objects(false, true, "exit");
-               this->map[i * x + j].typeOfSthElse = 'e';
+               this->map[i * x + j].objPtr = new Objects(false, false, "exit");
                break;
             }
             case 'R':
             {
-                this->map[i * x + j].ptr = new Objects(false, false, "rock");
-                this->map[i * x + j].typeOfSthElse = 'r';
+                this->map[i * x + j].objPtr = new Objects(false, false, "rock");
                 break;
             }
             case 'T':
             {
-                this->map[i * x + j].ptr = new Objects(true, false, "tree");
-                this->map[i * x + j].typeOfSthElse = 't';
+                this->map[i * x + j].objPtr = new Objects(true, false, "tree");
                 break;
             }
             case 'S':
@@ -67,15 +64,12 @@ Game::Game(std::string fileName) : heartPicked{false}
                                (j + 1) * 128,
                                (i + 1) * 128);
                 QPixmap pixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/snakey");
-                this->map[i * x + j].ptr = static_cast<Objects*>(new Personages(0, j, i, 9, rect, pixmap, "snakey"));
-                this->map[i * x + j].typeOfSthElse = 'b';
+                this->map[i * x + j].perPtr = new Personages(0, j, i, 9, rect, pixmap, "snakey");
                 break;
             }
             case 'H':
             {
-                this->map[i * x + j].ptr = new Objects(true, true, "heart");
-                this->map[i * x + j].typeOfSthElse = 'h';
-                qDebug() << this->map[i * x + j].ptr << static_cast<Heart*>(this->map[i * x + j].ptr);
+                this->map[i * x + j].objPtr = new Heart("heart");
                 break;
             }
             case 'L':
@@ -86,21 +80,18 @@ Game::Game(std::string fileName) : heartPicked{false}
                                (j + 1) * 128,
                                (i + 1) * 128);
                 QPixmap pixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/lolo");
-                this->map[i * x + j].ptr = static_cast<Objects*>(new Lolo(j,i,6,rect,pixmap, "lolo"));
-                this->lolo = static_cast<Lolo*>(this->map[i * x + j].ptr);
+                this->map[i * x + j].perPtr = new Lolo(j,i,6,rect,pixmap, "lolo");
+                this->lolo = static_cast<Lolo*>(this->map[i * x + j].perPtr);
                 this->lolo->makeWalkable();
-                this->map[i * x + j].typeOfSthElse = 'l';
                 break;
             }
             case 'C':
             {
-                this->map[i * x + j].ptr = new Objects(true, true, "chest01");
-                this->map[i * x + j].typeOfSthElse = 'c';
+                this->map[i * x + j].objPtr = new Chest("chest01");
                 break;
             }
             default:
             {
-                this->map[i * x + j].ptr = nullptr;
                 break;
             }
             }
@@ -122,7 +113,11 @@ Lolo *Game::getLolo()
 Game::~Game()
 {
     for (unsigned int i = 0; i < HEIGHT * WIDTH; i++)
-        if (this->map[i].ptr)
-            operator delete (this->map[i].ptr);
+    {
+        if (this->map[i].objPtr)
+            delete (this->map[i].objPtr);
+        if (this->map[i].perPtr)
+            delete (this->map[i].perPtr);
+    }
     delete map;
 }

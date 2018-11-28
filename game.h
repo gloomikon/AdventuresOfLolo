@@ -9,10 +9,9 @@ class Game
 private:
     struct  cell
     {
-        Objects     *ptr;
-        bool        isSome1Here = false;
+        Objects     *objPtr;
+        Personages  *perPtr;
         char        typeOfSurface;
-        char        typeOfSthElse;
     };
 
     bool    heartPicked;

@@ -7,7 +7,7 @@ class Heart : public Objects
 {
 private:
 public:
-    Heart(bool shootable, bool walkable, std::string imgName);
+    Heart(std::string imgName);
 };
 
 #endif // HEART_H

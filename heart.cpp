@@ -1,7 +1,7 @@
 #include "heart.h"
 #include "objects.h"
 
-Heart::Heart(bool shootable, bool walkable, std::string imgName):
-    Objects(shootable, walkable, imgName)
+Heart::Heart(std::string imgName):
+    Objects(true, true, imgName)
 {
 }
