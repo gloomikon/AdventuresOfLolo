@@ -16,7 +16,7 @@
 Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    this->setFixedSize(WIDTH*128,HEIGHT*128);
+    this->setFixedSize(WIDTH*SIZE,HEIGHT*SIZE);
     this->setAttribute(Qt::WA_OpaquePaintEvent);
     this->setWindowTitle("Adventures of Lolo by KOLUMBIA");
     this->game = new Game("level1.txt");
@@ -26,10 +26,6 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     connect(timer, SIGNAL(timeout()), this, SLOT(moving()));
 }
 
-Game *Widget::getGame()
-{
-    return this->game;
-}
 
 void Widget::drawSurface()
 {
@@ -71,6 +67,10 @@ void Widget::drawShoots()
                                                                         this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x,
                                                                         this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y))
                 {
+                    if (this->game->getMap()[i * WIDTH + j].perPtr->shooted(this->game,
+                                                                            this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x,
+                                                                            this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y) == 2)
+                        this->game->getMap()[this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y * WIDTH + this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x].perPtr->kill();
                     this->drawCell(this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x,
                                    this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y);
                     this->game->getMap()[i * WIDTH + j].perPtr->getTimer()->stop();
@@ -188,10 +188,10 @@ void Widget::drawCell(int x, int y, Personages *p)
     path += this->game->getMap()[y * WIDTH + x].typeOfSurface;
     path += ".png";
     QPixmap pixmap(path.c_str());
-    rect.setCoords(x * 128,
-                   y * 128,
-                   (x + 1) * 128,
-                   (y + 1) * 128);
+    rect.setCoords(x * SIZE,
+                   y * SIZE,
+                   (x + 1) * SIZE,
+                   (y + 1) * SIZE);
     painter.drawPixmap(rect, pixmap);
     if (this->game->getMap()[y * WIDTH + x].objPtr)
     {
@@ -204,10 +204,13 @@ void Widget::drawCell(int x, int y, Personages *p)
     if (this->game->getMap()[y * WIDTH + x].perPtr && this->game->getMap()[y * WIDTH + x].perPtr != p)
     {
         std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-        path += this->game->getMap()[y * WIDTH + x].perPtr->getImgName();
+        if (this->game->getMap()[y * WIDTH + x].perPtr && this->game->getMap()[y * WIDTH + x].perPtr->isAlive())
+            path += this->game->getMap()[y * WIDTH + x].perPtr->getImgName();
+        else
+            path += "rip";
         path += ".png";
         QPixmap pixmap(path.c_str());
-        painter.drawPixmap(rect, pixmap);
+        painter.drawPixmap(this->game->getMap()[y * WIDTH + x].perPtr->getRect(), pixmap);
     }
     if (p)
     {

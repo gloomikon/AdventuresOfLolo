@@ -59,10 +59,10 @@ Game::Game(std::string fileName) : heartPicked{false}
             case 'S':
             {
                 QRect rect;
-                rect.setCoords(j * 128,
-                               i * 128,
-                               (j + 1) * 128,
-                               (i + 1) * 128);
+                rect.setCoords(j * SIZE,
+                               i * SIZE,
+                               (j + 1) * SIZE,
+                               (i + 1) * SIZE);
                 QPixmap pixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/snakey");
                 this->map[i * x + j].perPtr = new Personages(0, j, i, 9, rect, pixmap, "snakey");
                 break;
@@ -75,10 +75,10 @@ Game::Game(std::string fileName) : heartPicked{false}
             case 'L':
             {
                 QRect rect;
-                rect.setCoords(j * 128,
-                               i * 128,
-                               (j + 1) * 128,
-                               (i + 1) * 128);
+                rect.setCoords(j * SIZE,
+                               i * SIZE,
+                               (j + 1) * SIZE,
+                               (i + 1) * SIZE);
                 QPixmap pixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/lolo");
                 this->map[i * x + j].perPtr = new Lolo(j,i,6,rect,pixmap, "lolo");
                 this->lolo = static_cast<Lolo*>(this->map[i * x + j].perPtr);

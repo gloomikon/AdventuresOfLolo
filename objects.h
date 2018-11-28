@@ -2,6 +2,7 @@
 # define OBJECTS_H
 # define HEIGHT 13
 # define WIDTH 13
+# define SIZE 128
 
 #include <iostream>
 

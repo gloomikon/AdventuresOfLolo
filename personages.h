@@ -50,12 +50,14 @@ public:
 
     Personages(bool shootable, int x, int y, int direction, QRect rect, QPixmap pixmap, std::string imgName);
 
+    bool            isAlive();
+
     bool            madeShoot();
 
-    bool            canMoveLeft(Game *game);
-    bool            canMoveRight(Game *game);
-    bool            canMoveUp(Game *game);
-    bool            canMoveDown(Game *game);
+    int             canMoveLeft(Game *game, int n = 0);
+    int             canMoveRight(Game *game, int n = 0);
+    int             canMoveUp(Game *game, int n = 0);
+    int             canMoveDown(Game *game, int n = 0);
 
     void            moveLeft(Game *game, QTimer *timer);
     void            moveRight(Game *game, QTimer *timer);
@@ -94,6 +96,7 @@ public:
     Shoot           *getShoot();
 
     void            setBoolShoot(bool shoot);
+    void            kill();
 
 };
 

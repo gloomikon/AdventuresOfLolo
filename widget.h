@@ -34,7 +34,6 @@ protected:
     void    keyPressEvent(QKeyEvent *);
 public:
     explicit Widget(QWidget *parent = nullptr);
-    Game    *getGame();
     ~Widget();
 
 
