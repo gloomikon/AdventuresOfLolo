@@ -97,7 +97,7 @@ public:
 
     void            setBoolShoot(bool shoot);
     void            kill();
-
+    void            reincarnate();
 };
 
 #endif // PERSONAGES_H

@@ -14,10 +14,11 @@ private:
         char        typeOfSurface;
     };
 
-    bool    heartPicked;
+    int     heartsToPick;
     int     lives;
     cell    *map;
     Lolo    *lolo;
+    Chest   *chest;
 public:
 
     bool            wasHeartPicked();
@@ -27,6 +28,8 @@ public:
 
     cell    *getMap();
     Lolo    *getLolo();
+    Chest   *getChest();
+    int     getHeartsToPick();
     ~Game();
 };
 

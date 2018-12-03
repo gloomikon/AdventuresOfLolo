@@ -12,7 +12,7 @@
 #include <QThread>
 #include <QDebug>
 
-void drawMap(Game *game)
+/*void drawMap(Game *game)
 {
     for (int i = 5; i < 8; i++)
     {
@@ -20,7 +20,7 @@ void drawMap(Game *game)
             qDebug() << i << j << game->getMap()[i * WIDTH + j].objPtr << " , " << game->getMap()[i * WIDTH + j].perPtr;
         qDebug() << "\n";
     }
-}
+}*/
 Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
@@ -144,7 +144,8 @@ void Widget::moving()
     {
         this->game->getLolo()->moveRight(this->game, this->timer);
     }
-    drawMap(this->game);
+    this->game->getLolo()->checkPickUp(this->game);
+    //drawMap(this->game);
     /*if (this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].typeOfSthElse == 'h')
     {
         if (!this->game->wasHeartPicked())

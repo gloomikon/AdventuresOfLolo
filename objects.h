@@ -4,7 +4,8 @@
 # define WIDTH 13
 # define SIZE 128
 
-#include <iostream>
+# include <iostream>
+# include <QObject>
 
 
 class Objects

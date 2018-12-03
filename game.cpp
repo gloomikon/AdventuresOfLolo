@@ -6,23 +6,13 @@
 
 static const std::string LVL_PATH = "C://Users/gloomikon/Documents/AndenturesOfLolo/lvls/";
 
-bool Game::wasHeartPicked()
-{
-    return this->heartPicked;
-}
-
-void Game::setHeartPickedStatus(bool picked)
-{
-    this->heartPicked = picked;
-}
-
-Game::Game(std::string fileName) : heartPicked{false}
+Game::Game(std::string fileName)
 {
     std::ifstream   file;
     int             x = 0;
     int             y = 0;
     char            c;
-
+    this->heartsToPick = 0;
 
     file.open(LVL_PATH + fileName);
     file >> x >> y;
@@ -70,6 +60,7 @@ Game::Game(std::string fileName) : heartPicked{false}
             case 'H':
             {
                 this->map[i * x + j].objPtr = new Heart("heart");
+                this->heartsToPick++;
                 break;
             }
             case 'L':
@@ -88,6 +79,7 @@ Game::Game(std::string fileName) : heartPicked{false}
             case 'C':
             {
                 this->map[i * x + j].objPtr = new Chest("chest01");
+                this->chest = static_cast<Chest*>(this->map[i * x + j].objPtr);
                 break;
             }
             default:
@@ -107,6 +99,16 @@ Game::cell *Game::getMap()
 Lolo *Game::getLolo()
 {
     return this->lolo;
+}
+
+Chest *Game::getChest()
+{
+    return this->chest;
+}
+
+int Game::getHeartsToPick()
+{
+    return this->heartsToPick;
 }
 
 

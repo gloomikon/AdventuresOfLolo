@@ -42,7 +42,8 @@ int Personages::canMoveLeft(Game *game, int n)
             k = 0;
         else if (this->steps.stepLeftRight == 3)
             k = 1;
-        if ((game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 1 + k].perPtr &&
+        if (this->steps.stepLeftRight != 0 &&
+                ((game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 1 + k].perPtr &&
              game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 1 + k].perPtr->alive &&
              game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 1 + k].perPtr != this) ||
                 (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1 + k].perPtr &&
@@ -53,10 +54,13 @@ int Personages::canMoveLeft(Game *game, int n)
                  game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1 + k].perPtr->getSteps().stepUpDown == 12)  ||
                 (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 2 + k].perPtr &&
                  game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 2 + k].perPtr->getSteps().stepLeftRight == 3 &&
-                 game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 2 + k].perPtr->getSteps().stepUpDown == 6) ||
+                 game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 2 + k].perPtr->getSteps().stepUpDown == 6)||
+                 (game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 2 + k].perPtr &&
+                  game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 2 + k].perPtr->getSteps().stepLeftRight == 3 &&
+                  game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 2 + k].perPtr->isAlive()) ||
                 (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 2 + k].perPtr &&
                  game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 2 + k].perPtr->getSteps().stepLeftRight == 3 &&
-                 game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 2 + k].perPtr->getSteps().stepUpDown == 12))
+                 game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 2 + k].perPtr->getSteps().stepUpDown == 12)))
             return 0;
             if (this->steps.stepLeftRight == 0 &&
                 ((game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 1].perPtr &&
@@ -250,7 +254,7 @@ int Personages::canMoveDown(Game *game, int n)
         return 0;
     if (this->steps.stepLeftRight == 9)
     {
-        if ((game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].objPtr &&
+        if ((game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].objPtr &&
              !(game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].objPtr->isWalkable())) ||
                 (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr &&
                  game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr != this &&
@@ -1074,4 +1078,10 @@ void Personages::setBoolShoot(bool shoot)
 void Personages::kill()
 {
     this->alive = false;
+    QTimer::singleShot(5000, [=]() { reincarnate(); });
+}
+
+void Personages::reincarnate()
+{
+    this->alive = true;
 }

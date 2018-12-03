@@ -10,6 +10,7 @@ private:
 public:
     Chest(std::string imgName);
     bool    isOpened();
+    void    open();
 };
 
 #endif // CHEST_H

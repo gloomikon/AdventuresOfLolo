@@ -8,3 +8,9 @@ bool Chest::isOpened()
 {
     return this->opened;
 }
+
+void Chest::open()
+{
+    this->opened = true;
+    this->setImgName("chest02");
+}
