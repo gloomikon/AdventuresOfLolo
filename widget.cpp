@@ -12,15 +12,15 @@
 #include <QThread>
 #include <QDebug>
 
-/*void drawMap(Game *game)
+void drawMap(Game *game)
 {
     for (int i = 5; i < 8; i++)
     {
-        for (int j = 3; j < 9; j++)
+        for (int j = 3; j < 10; j++)
             qDebug() << i << j << game->getMap()[i * WIDTH + j].objPtr << " , " << game->getMap()[i * WIDTH + j].perPtr;
         qDebug() << "\n";
     }
-}*/
+}
 Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
@@ -166,7 +166,7 @@ void Widget::moving()
         this->game->getLolo()->moveRight(this->game, this->timer);
     }
     this->game->getLolo()->checkPickUp(this->game);
-    //drawMap(this->game);
+    drawMap(this->game);
     update();
 }
 
