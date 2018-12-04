@@ -27,9 +27,8 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     this->setFixedSize(WIDTH*SIZE,HEIGHT*SIZE);
     this->setAttribute(Qt::WA_OpaquePaintEvent);
     this->setWindowTitle("Adventures of Lolo by KOLUMBIA");
-    this->game = new Game("level1.txt");
-    this->game->getLolo()->setTimer(new QTimer(this));
-    connect(this->game->getLolo()->getTimer(), SIGNAL(timeout()), this, SLOT(shooting()));
+    this->game = new Game(this);
+    connectTimers();
     this->timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(moving()));
 }
@@ -48,6 +47,16 @@ void Widget::drawLolo()
     QPainter painter(this);
     painter.drawPixmap(this->game->getLolo()->getRect(), this->game->getLolo()->getPixmap());
 }
+
+void Widget::connectTimers()
+{
+    for (int i = 0; i < WIDTH * HEIGHT; i++)
+        if (this->game->getMap()[i].perPtr)
+        {
+            this->game->getMap()[i].perPtr->setTimer(new QTimer(this));
+            connect(this->game->getMap()[i].perPtr->getTimer(), SIGNAL(timeout()), this, SLOT(shooting()));
+        }
+}
 void Widget::drawObjects()
 {
     for (int i = 0; i < HEIGHT; i++)
@@ -55,8 +64,18 @@ void Widget::drawObjects()
         {
             if (this->game->getMap()[i * WIDTH + j].perPtr && !dynamic_cast<Lolo*>(this->game->getMap()[i * WIDTH + j].perPtr))
             {
-                this->drawCell(j,i);
+                if (this->game->getMap()[i * WIDTH + j].perPtr->getSteps().stepLeftRight == 9)
+                    this->drawCell(j-1,i);
+                if (this->game->getMap()[i * WIDTH + j].perPtr->getSteps().stepLeftRight == 3)
+                    this->drawCell(j+1,i);
+                if (this->game->getMap()[i * WIDTH + j].perPtr->getSteps().stepUpDown == 12)
+                    this->drawCell(j,i-1);
+                if (this->game->getMap()[i * WIDTH + j].perPtr->getSteps().stepUpDown == 6)
+                    this->drawCell(j,i+1);
+                                this->drawCell(j,i);
             }
+            if (this->game->getMap()[i * WIDTH + j].objPtr == this->game->getChest())
+                this->drawCell(j,i);
         }
 }
 
@@ -110,16 +129,18 @@ void Widget::updShootBg(Personages *p)
 }
 void Widget::paintEvent(QPaintEvent *)
 {
-    static bool drawed = false;
-    if (!drawed)
+    if (this->game->isActive())
     {
-        this->drawSurface();
-        drawed = true;
+        if (game->getFirstDraw())
+        {
+            this->drawSurface();
+            game->setFirstDraw(false);
+        }
+        this->updBg(this->game->getLolo());
+        this->drawObjects();
+        this->drawLolo();
+        this->drawShoots();
     }
-    this->updBg(this->game->getLolo());
-    this->drawObjects();
-    this->drawLolo();
-    this->drawShoots();
 }
 
 void Widget::moving()
@@ -146,21 +167,6 @@ void Widget::moving()
     }
     this->game->getLolo()->checkPickUp(this->game);
     //drawMap(this->game);
-    /*if (this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].typeOfSthElse == 'h')
-    {
-        if (!this->game->wasHeartPicked())
-        {
-            this->game->setHeartPickedStatus(true);
-            this->game->lolo->shoots = 2;
-        }
-        delete static_cast<Heart*>(this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].ptr);
-        //qDebug() << this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].ptr;
-        this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].isLoloHere = false;
-        this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].ptr = nullptr;
-        this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].typeOfSthElse = 'f';
-        this->game->map[this->game->lolo->y * WIDTH + this->game->lolo->x].imgName = "";
-
-    }*/
     update();
 }
 
@@ -228,7 +234,6 @@ void Widget::drawCell(int x, int y, Personages *p)
         int *cx2 = new int;
         int *cy1 = new int;
         int *cy2 = new int;
-                //qDebug() << "PERS" << p->getCoords().x << p->getCoords().y << "\nSHOOT" << p->getShoot()->coords.x << p->getShoot()->coords.y;
         QRect rect;
         QPainter painter(this);
         p->getRect().getCoords(cx1, cy1, cx2, cy2);
@@ -242,7 +247,8 @@ void Widget::drawCell(int x, int y, Personages *p)
 }
 void Widget::keyPressEvent(QKeyEvent *e)
 {
-
+    if(this->game->isActive())
+    {
         if (e->key() == Qt::Key_S || e->key() == Qt::Key_Down)
         {
             if (!this->timer->isActive())
@@ -279,7 +285,6 @@ void Widget::keyPressEvent(QKeyEvent *e)
                 this->timer->start(10);
             }
         }
-
         else if (e->key() == Qt::Key_Space)
         {
             if (!this->game->getLolo()->getTimer()->isActive())
@@ -289,6 +294,7 @@ void Widget::keyPressEvent(QKeyEvent *e)
                 this->game->getLolo()->getTimer()->start(10);
             }
         }
+    }
 }
 Widget::~Widget()
 {

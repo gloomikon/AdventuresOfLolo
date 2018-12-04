@@ -1,6 +1,5 @@
 #include "personages.h"
 #include "game.h"
-#include "widget.h"
 #include <QDebug>
 #include <ctime>
 #include <cstdlib>

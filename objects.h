@@ -21,6 +21,7 @@ public:
     bool        isShootable();
     bool        isWalkable();
     void        setImgName(std::string imgName);
+    void        makeWalkable();
     std::string getImgName();
 
     virtual ~Objects() = default;

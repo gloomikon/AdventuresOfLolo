@@ -19,6 +19,11 @@ void Objects::setImgName(std::string imgName)
     this->imgName = imgName;
 }
 
+void Objects::makeWalkable()
+{
+    this->walkable = true;
+}
+
 std::string Objects::getImgName()
 {
     return this->imgName;

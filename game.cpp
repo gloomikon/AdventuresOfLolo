@@ -1,12 +1,19 @@
 #include <fstream>
 #include <string.h>
 #include "game.h"
-
+#include "widget.h"
 #include <QDebug>
 
 static const std::string LVL_PATH = "C://Users/gloomikon/Documents/AndenturesOfLolo/lvls/";
 
-Game::Game(std::string fileName)
+Game::Game(Widget *w) : lives{5}, level{1}, active{true}, firstDraw{true}, w{w}
+{
+    std::string s;
+    s = std::to_string(this->level) + ".txt";
+    readFromFile(s);
+}
+
+void Game::readFromFile(std::string fileName)
 {
     std::ifstream   file;
     int             x = 0;
@@ -34,6 +41,7 @@ Game::Game(std::string fileName)
             case 'E':
             {
                this->map[i * x + j].objPtr = new Objects(false, false, "exit");
+                this->exit = this->map[i * x + j].objPtr;
                break;
             }
             case 'R':
@@ -91,6 +99,21 @@ Game::Game(std::string fileName)
     file.close();
 }
 
+void Game::nextLevel()
+{
+    for (unsigned int i = 0; i < HEIGHT * WIDTH; i++)
+    {
+        if (this->map[i].objPtr)
+            delete (this->map[i].objPtr);
+        if (this->map[i].perPtr)
+            delete (this->map[i].perPtr);
+    }
+    delete map;
+    std::string s;
+    s = std::to_string(this->level) + ".txt";
+    readFromFile(s);
+    this->firstDraw = true;
+}
 Game::cell *Game::getMap()
 {
     return this->map;
@@ -106,9 +129,56 @@ Chest *Game::getChest()
     return this->chest;
 }
 
+bool Game::isActive()
+{
+    return this->active;
+}
+
+Objects *Game::getEXit()
+{
+    return this->exit;
+}
+
+void Game::disactivate()
+{
+    this->active = false;
+}
+
+void Game::activate()
+{
+    this->active = true;
+}
+
 int Game::getHeartsToPick()
 {
     return this->heartsToPick;
+}
+
+bool Game::getFirstDraw()
+{
+    return this->firstDraw;
+}
+
+void Game::setFirstDraw(bool f)
+{
+    this->firstDraw = f;
+}
+
+void Game::clear()
+{
+    for (unsigned int i = 0; i < HEIGHT * WIDTH; i++)
+    {
+        if (this->map[i].perPtr && this->map[i].perPtr != this->lolo)
+        {
+            delete (this->map[i].perPtr);
+            this->map[i].perPtr = nullptr;
+        }
+    }
+}
+
+Widget *Game::getWidget()
+{
+    return this->w;
 }
 
 

@@ -7,7 +7,6 @@
 
 
 class Game;
-class Widget;
 
 class Personages : public Objects
 {

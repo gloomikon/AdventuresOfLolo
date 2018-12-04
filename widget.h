@@ -29,10 +29,12 @@ private:
     void        updShootBg(Personages *p);
     void        drawLolo();
     QTimer      *timer;
+
 protected:
     void    paintEvent(QPaintEvent *);
     void    keyPressEvent(QKeyEvent *);
 public:
+    void        connectTimers();
     explicit Widget(QWidget *parent = nullptr);
     ~Widget();
 
