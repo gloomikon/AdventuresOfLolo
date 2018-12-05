@@ -9,6 +9,15 @@ Personages::Personages(bool shootable, int x, int y, int direction, QRect pRect,
     pImage{pRect, pPixmap}
 {}
 
+Personages::~Personages()
+{
+    if (this->timer)
+    {
+        this->timer->stop();
+        delete this->timer;
+    }
+}
+
 bool Personages::isAlive()
 {
     return this->alive;
@@ -98,10 +107,10 @@ int Personages::canMoveLeft(Game *game, int n)
             else if (this->steps.stepUpDown == 6)
                 j = 1;
         if (this->steps.stepLeftRight == 0 &&
-                ((game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 1].objPtr &&
-                     !(game->getMap()[(this->coords.y) * WIDTH + this->coords.x - 1].objPtr->isWalkable())) ||
-                (game->getMap()[(this->coords.y - j) * WIDTH + this->coords.x - 1].objPtr &&
-                                     !(game->getMap()[(this->coords.y - j) * WIDTH + this->coords.x - 1].objPtr->isWalkable())) ||
+                ((game->getMap()[(this->coords.y + j) * WIDTH + this->coords.x - 1].objPtr &&
+                     !(game->getMap()[(this->coords.y + j) * WIDTH + this->coords.x - 1].objPtr->isWalkable())) ||
+                (game->getMap()[(this->coords.y - 1 + j) * WIDTH + this->coords.x - 1].objPtr &&
+                                     !(game->getMap()[(this->coords.y - 1 + j) * WIDTH + this->coords.x - 1].objPtr->isWalkable())) ||
                         (game->getMap()[(this->coords.y + j) * WIDTH + this->coords.x - 1].perPtr &&
                          game->getMap()[(this->coords.y + j) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepLeftRight != 9 &&
                           game->getMap()[(this->coords.y + j) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepUpDown != 6) ||
@@ -164,7 +173,7 @@ int Personages::canMoveRight(Game *game, int n)
               game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1 - k].perPtr->getSteps().stepLeftRight == 3 &&
               game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1 - k].perPtr->getSteps().stepUpDown == 12)  ||
              (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 2 - k].perPtr &&
-              game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 2 - k].perPtr->getSteps().stepLeftRight == 9 &
+              game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 2 - k].perPtr->getSteps().stepLeftRight == 9 &&
               game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 2 - k].perPtr->getSteps().stepUpDown == 6)||
                  (game->getMap()[(this->coords.y) * WIDTH + this->coords.x + 2 - k].perPtr &&
                   game->getMap()[(this->coords.y) * WIDTH + this->coords.x + 2 - k].perPtr->getSteps().stepLeftRight == 9 &&
@@ -211,10 +220,10 @@ int Personages::canMoveRight(Game *game, int n)
             else if (this->steps.stepUpDown == 6)
                 j = 1;
         if (this->steps.stepLeftRight == 0 &&
-                ((game->getMap()[(this->coords.y) * WIDTH + this->coords.x + 1].objPtr &&
-                !(game->getMap()[(this->coords.y) * WIDTH + this->coords.x + 1].objPtr->isWalkable())) ||
-             (game->getMap()[(this->coords.y - j) * WIDTH + this->coords.x + 1].objPtr &&
-            !(game->getMap()[(this->coords.y - j) * WIDTH + this->coords.x + 1].objPtr->isWalkable())) ||
+                ((game->getMap()[(this->coords.y - 1 + j) * WIDTH + this->coords.x + 1].objPtr &&
+                !(game->getMap()[(this->coords.y - 1 + j) * WIDTH + this->coords.x + 1].objPtr->isWalkable())) ||
+             (game->getMap()[(this->coords.y + j) * WIDTH + this->coords.x + 1].objPtr &&
+            !(game->getMap()[(this->coords.y + j) * WIDTH + this->coords.x + 1].objPtr->isWalkable())) ||
              (game->getMap()[(this->coords.y + j) * WIDTH + this->coords.x + 1].perPtr &&
               game->getMap()[(this->coords.y + j) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepLeftRight != 3 &&
               game->getMap()[(this->coords.y + j) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown != 6) ||
@@ -247,138 +256,226 @@ int Personages::canMoveRight(Game *game, int n)
 
 int Personages::canMoveUp(Game *game, int n)
 {
-    if (this->steps.stepUpDown == 6)
-        return 1;
+    if (this->steps.stepLeftRight == 0)
+    {
+        int k = 0;
+        if (this->steps.stepUpDown == 0 && ((game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].objPtr &&
+             !(game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].objPtr->isWalkable())) ||
+              (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr &&
+               game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->alive &&
+               game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->getSteps().stepUpDown == 0) ||
+          (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr &&
+           game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepUpDown == 0 &&
+           game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepLeftRight == 3) ||
+          (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr &&
+           game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == 0 &&
+           game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepLeftRight == 9)))
+            return 0;
+        if (this->steps.stepUpDown == 12)
+            k = 0;
+        else if (this->steps.stepUpDown == 6)
+            k = 1;
+        if (this->steps.stepUpDown != 0 &&
+                ((game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x].perPtr &&
+                  game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x].perPtr->alive &&
+                  game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x].perPtr != this) ||
+             (game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x - 1].perPtr &&
+              game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepLeftRight == 3 &&
+              game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepUpDown == 12) ||
+             (game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1].perPtr &&
+              game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepLeftRight == 9 &&
+              game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == 12)  ||
+             (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - 1].perPtr &&
+              game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepLeftRight == 3 &&
+              game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepUpDown == 6)||
+                 (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr &&
+                  game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr->getSteps().stepUpDown == 6 &&
+                  game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr->isAlive()) ||
+             (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1].perPtr &&
+              game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepLeftRight == 9 &&
+              game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == 6)))
+            return 0;
+            if (this->steps.stepUpDown == 0 &&
+                ((game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr &&
+                 !game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->isAlive() &&
+                  game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->steps.stepUpDown == 0)))
+            {
+                if (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->canMoveUp(game, n + 1))
+                    return 2;
+                return 0;
+            }
+            if (this->steps.stepUpDown != 0 &&
+                    (game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x].perPtr &&
+                    !game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x].perPtr->isAlive() &&
+                     game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x].perPtr->steps.stepUpDown == 12))
+            {
+                if (game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x].perPtr->canMoveUp(game, n + 1))
+                    return 2;
+                return 0;
+            }
 
-    if ((game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].objPtr &&
-         !(game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].objPtr->isWalkable())) ||
-            (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr &&
-             game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr != this &&
-             game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->alive &&
-             game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->getSteps().stepUpDown == this->steps.stepUpDown))
-        return 0;
-    if (this->steps.stepLeftRight == 9)
-    {
-        if ((game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].objPtr &&
-             !(game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].objPtr->isWalkable())) ||
-                (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr &&
-                 game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr != this &&
-                 game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr->alive &&
-                 game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepUpDown == this->steps.stepUpDown))
-            return 0;
+            if (this->steps.stepUpDown != 0 &&
+                    (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr &&
+                    !game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr->isAlive() &&
+                     game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr->steps.stepUpDown == 6))
+            {
+                if (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr->canMoveUp(game, n + 1))
+                    return 3;
+                return 0;
+            }
     }
-    if (this->steps.stepLeftRight == 3)
+     else
     {
-        if ((game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].objPtr &&
-             !(game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].objPtr->isWalkable())) ||
-                (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr &&
-                 game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr != this &&
-                 game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr->alive &&
-                 game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == this->steps.stepUpDown))
+            int j = 0;
+            int k = 0;
+        if (this->steps.stepLeftRight == 3)
+                j = 0;
+            else if (this->steps.stepLeftRight == 9)
+                j = 1;
+        if (this->steps.stepUpDown == 0 &&
+                ((game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - j].objPtr &&
+                !(game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - j].objPtr->isWalkable())) ||
+             (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1 - j].objPtr &&
+            !(game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1 - j].objPtr->isWalkable())) ||
+             (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - j].perPtr &&
+              game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - j].perPtr->getSteps().stepLeftRight != 9 &&
+              game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - j].perPtr->getSteps().stepUpDown != 12) ||
+         (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1 - j].perPtr &&
+          game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepLeftRight != 3 &&
+          game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepUpDown != 12)))
             return 0;
-    }
+        if (this->steps.stepUpDown == 12)
+            k = 0;
+        else if (this->steps.stepUpDown == 6)
+            k = 1;
+        if (this->steps.stepUpDown != 0 &&
+                        ((game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x - j].perPtr &&
+                          game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x - j].perPtr != this &&
+                          game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x - j].perPtr->getSteps().stepLeftRight != 9) ||
+                (game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1 - j].perPtr &&
+                 game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1 - j].perPtr != this &&
+                  game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepLeftRight != 3) ||
+                         (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - j].perPtr &&
+                           game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - j].perPtr->getSteps().stepLeftRight != 9 &&
+                          game->getMap()[(this->coords.y  - 2 + k) * WIDTH + this->coords.x - j].perPtr->getSteps().stepUpDown == 6) ||
+                         (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1 - j].perPtr &&
+                           game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepLeftRight != 3 &&
+                          game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepUpDown == 6)))
+            return 0;
 
-    if (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr &&
-            game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr != this &&
-            !game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->alive &&
-            game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->steps.stepUpDown == this->steps.stepUpDown)
-    {
-        if (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->canMoveUp(game, n + 1) && !n)
-            return 2;
-        return 0;
-    }
-    if (this->steps.stepLeftRight == 9)
-    {
-        if (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr &&
-                game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr != this &&
-                !game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr->alive &&
-                game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr->steps.stepUpDown == this->steps.stepUpDown)
-        {
-            if (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x - 1].perPtr->canMoveUp(game, n + 1) && !n)
-                return 2;
-            return 0;
-        }
-    }
-    if (this->steps.stepLeftRight == 3)
-    {
-        if (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr &&
-                game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr != this &&
-                !game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr->alive &&
-                game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr->steps.stepUpDown == this->steps.stepUpDown)
-        {
-            if (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x + 1].perPtr->canMoveUp(game, n + 1) && !n)
-                return 2;
-            return 0;
-        }
     }
     return 1;
 }
 
 int Personages::canMoveDown(Game *game, int n)
 {
-    if (this->steps.stepUpDown == 12)
-        return 1;
+    if (this->steps.stepLeftRight == 0)
+    {
+        int k = 0;
+        if (this->steps.stepUpDown == 0 && ((game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].objPtr &&
+             !(game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].objPtr->isWalkable())) ||
+              (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr &&
+               game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->alive &&
+               game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->getSteps().stepUpDown == 0) ||
+          (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr &&
+           game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepUpDown == 0 &&
+           game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepLeftRight == 3) ||
+          (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr &&
+           game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == 0 &&
+           game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepLeftRight == 9)))
+            return 0;
+        if (this->steps.stepUpDown == 6)
+            k = 0;
+        else if (this->steps.stepUpDown == 12)
+            k = 1;
+        if (this->steps.stepUpDown != 0 &&
+                ((game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x].perPtr &&
+                  game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x].perPtr->alive &&
+                  game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x].perPtr != this) ||
+             (game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x - 1].perPtr &&
+              game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepLeftRight == 3 &&
+              game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepUpDown == 6) ||
+             (game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x + 1].perPtr &&
+              game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepLeftRight == 9 &&
+              game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == 6)  ||
+             (game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x - 1].perPtr &&
+              game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepLeftRight == 3 &&
+              game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepUpDown == 12)||
+                 (game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x].perPtr &&
+                  game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x].perPtr->getSteps().stepUpDown == 12 &&
+                  game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x].perPtr->isAlive()) ||
+             (game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x + 1].perPtr &&
+              game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepLeftRight == 9 &&
+              game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == 12)))
+            return 0;
+            if (this->steps.stepUpDown == 0 &&
+                ((game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr &&
+                 !game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->isAlive() &&
+                  game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->steps.stepUpDown == 0)))
+            {
+                if (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->canMoveDown(game, n + 1))
+                    return 2;
+                return 0;
+            }
+            if (this->steps.stepUpDown != 0 &&
+                    (game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x].perPtr &&
+                    !game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x].perPtr->isAlive() &&
+                     game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x].perPtr->steps.stepUpDown == 6))
+            {
+                if (game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x].perPtr->canMoveDown(game, n + 1))
+                    return 2;
+                return 0;
+            }
 
-    if ((game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].objPtr &&
-         !(game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].objPtr->isWalkable())) ||
-            (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr &&
-             game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr != this &&
-             game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->alive &&
-             game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->getSteps().stepUpDown == this->steps.stepUpDown))
-        return 0;
-    if (this->steps.stepLeftRight == 9)
-    {
-        if ((game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].objPtr &&
-             !(game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].objPtr->isWalkable())) ||
-                (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr &&
-                 game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr != this &&
-                 game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr->alive &&
-                 game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepUpDown == this->steps.stepUpDown))
-            return 0;
+            if (this->steps.stepUpDown != 0 &&
+                    (game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x].perPtr &&
+                    !game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x].perPtr->isAlive() &&
+                     game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x].perPtr->steps.stepUpDown == 12))
+            {
+                if (game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x].perPtr->canMoveDown(game, n + 1))
+                    return 3;
+                return 0;
+            }
     }
-    if (this->steps.stepLeftRight == 3)
+     else
     {
-        if ((game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].objPtr &&
-             !(game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].objPtr->isWalkable())) ||
-                (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr &&
-                 game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr != this &&
-                 game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr->alive &&
-                 game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == this->steps.stepUpDown))
+            int j = 0;
+            int k = 0;
+        if (this->steps.stepLeftRight == 3)
+                j = 0;
+            else if (this->steps.stepLeftRight == 9)
+                j = 1;
+        if (this->steps.stepUpDown == 0 &&
+                ((game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - j].objPtr &&
+                !(game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - j].objPtr->isWalkable())) ||
+             (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1 - j].objPtr &&
+            !(game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1 - j].objPtr->isWalkable())) ||
+             (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - j].perPtr &&
+              game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - j].perPtr->getSteps().stepLeftRight != 9 &&
+              game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - j].perPtr->getSteps().stepUpDown != 6) ||
+         (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1 - j].perPtr &&
+          game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepLeftRight != 3 &&
+          game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepUpDown != 6)))
             return 0;
-    }
+        if (this->steps.stepUpDown == 6)
+            k = 0;
+        else if (this->steps.stepUpDown == 12)
+            k = 1;
+        if (this->steps.stepUpDown != 0 &&
+                        ((game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x - j].perPtr &&
+                          game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x - j].perPtr != this &&
+                          game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x - j].perPtr->getSteps().stepLeftRight != 9) ||
+                (game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x + 1 - j].perPtr &&
+                 game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x + 1 - j].perPtr != this &&
+                  game->getMap()[(this->coords.y + 1 - k) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepLeftRight != 3) ||
+                         (game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x - j].perPtr &&
+                           game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x - j].perPtr->getSteps().stepLeftRight != 9 &&
+                          game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x - j].perPtr->getSteps().stepUpDown == 12) ||
+                         (game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x + 1 - j].perPtr &&
+                           game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepLeftRight != 3 &&
+                          game->getMap()[(this->coords.y + 2 - k) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepUpDown == 12)))
+            return 0;
 
-    if (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr &&
-            game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr != this &&
-            !game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->alive &&
-            game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->steps.stepUpDown == this->steps.stepUpDown)
-    {
-        if (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->canMoveDown(game, n + 1) && !n)
-            return 2;
-        return 0;
-    }
-    if (this->steps.stepLeftRight == 9)
-    {
-        if (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr &&
-                game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr != this &&
-                !game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr->alive &&
-                game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr->steps.stepUpDown == this->steps.stepUpDown)
-        {
-            if (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x - 1].perPtr->canMoveDown(game, n + 1) && !n)
-                return 2;
-            return 0;
-        }
-    }
-    if (this->steps.stepLeftRight == 3)
-    {
-        if (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr &&
-                game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr != this &&
-                !game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr->alive &&
-                game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr->steps.stepUpDown == this->steps.stepUpDown)
-        {
-            if (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x + 1].perPtr->canMoveDown(game, n + 1) && !n)
-                return 2;
-            return 0;
-        }
     }
     return 1;
 }
@@ -663,13 +760,21 @@ void Personages::moveUp(Game *game, QTimer *timer)
     this->pImage.rect.getCoords(x1, y1, x2, y2);
     if (this->canMoveUp(game))
     {
-        if (this->canMoveUp(game) == 2)
-            mooving = true;
-        this->pImage.rect.moveTop(*y1 - SIZE/32);
-        if (mooving && game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr)
+        Personages *p = nullptr;
+        if (this->canMoveUp(game) > 1)
         {
-            game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->pImage.rect.getCoords(x1, y1, x2, y2);
-            game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->pImage.rect.moveTop(*y1 - SIZE/32);
+            mooving = true;
+            if (this->canMoveUp(game) == 2)
+                p = game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr;
+            else
+                p = game->getMap()[(this->coords.y - 2) * WIDTH + this->coords.x].perPtr;
+        }
+        this->pImage.rect.moveTop(*y1 - SIZE/32);
+
+        if (mooving && p)
+        {
+            p->pImage.rect.getCoords(x1, y1, x2, y2);
+            p->pImage.rect.moveTop(*y1 - SIZE/32);
         }
         steps+=SIZE / 32;
         if (steps >= SIZE/32*2 && steps < SIZE/32*4)
@@ -734,11 +839,14 @@ void Personages::moveUp(Game *game, QTimer *timer)
             {
                 if (this->steps.stepUpDown == 12)
                 {
-                    if (mooving && game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr)
+                    if (mooving && p)
                     {
-                        game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->coords.y--;
-                        game->getMap()[(this->coords.y - 2) * WIDTH + this->coords.x].perPtr = game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr;
-                        game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr = nullptr;
+                        if (this->canMoveUp(game) == 2)
+                        {
+                            p->coords.y--;
+                            game->getMap()[p->coords.y * WIDTH + p->coords.x].perPtr = p;
+                            game->getMap()[(p->coords.y + 1) * WIDTH + p->coords.x].perPtr = nullptr;
+                        }
                     }
                     this->coords.y--;
                     if (game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr == this)
@@ -751,15 +859,17 @@ void Personages::moveUp(Game *game, QTimer *timer)
                     game->getMap()[this->coords.y * WIDTH + this->coords.x].perPtr = this;
                 }
                 {
-                    if (mooving && game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr)
-                        game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->steps.stepUpDown = 0;
-                        this->steps.stepUpDown = 0;
+                    {
+                        if (mooving && p)
+                            p->steps.stepUpDown = 0;
+                            this->steps.stepUpDown = 0;
+                    }
                 }
             }
         else
             {
-                if (mooving && game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr)
-                    game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr->steps.stepUpDown = 12;
+                if (mooving && p)
+                    p->steps.stepUpDown = 12;
                 this->steps.stepUpDown = 12;
             }
         steps = 0;
@@ -786,13 +896,21 @@ void Personages::moveDown(Game *game, QTimer *timer)
     this->pImage.rect.getCoords(x1, y1, x2, y2);
     if (this->canMoveDown(game))
     {
-        if (this->canMoveDown(game) == 2)
-            mooving = true;
-        this->pImage.rect.moveTop(*y1 + SIZE/32);
-        if (mooving && game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr)
+        Personages *p = nullptr;
+        if (this->canMoveDown(game) > 1)
         {
-            game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->pImage.rect.getCoords(x1, y1, x2, y2);
-            game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->pImage.rect.moveTop(*y1 + SIZE/32);
+            mooving = true;
+            if (this->canMoveDown(game) == 2)
+                p = game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr;
+            else
+                p = game->getMap()[(this->coords.y + 2) * WIDTH + this->coords.x].perPtr;
+        }
+        this->pImage.rect.moveTop(*y1 + SIZE/32);
+
+        if (mooving && p)
+        {
+            p->pImage.rect.getCoords(x1, y1, x2, y2);
+            p->pImage.rect.moveTop(*y1 + SIZE/32);
         }
         steps+=SIZE / 32;
         if (steps >= SIZE/32*2 && steps < SIZE/32*4)
@@ -857,11 +975,14 @@ void Personages::moveDown(Game *game, QTimer *timer)
             {
                 if (this->steps.stepUpDown == 6)
                 {
-                    if (mooving && game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr)
+                    if (mooving && p)
                     {
-                        game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->coords.y++;
-                        game->getMap()[(this->coords.y + 2) * WIDTH + this->coords.x].perPtr = game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr;
-                        game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr = nullptr;
+                        if (this->canMoveDown(game) == 2)
+                        {
+                            p->coords.y++;
+                            game->getMap()[p->coords.y * WIDTH + p->coords.x].perPtr = p;
+                            game->getMap()[(p->coords.y - 1) * WIDTH + p->coords.x].perPtr = nullptr;
+                        }
                     }
                     this->coords.y++;
                     if (game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr == this)
@@ -874,15 +995,15 @@ void Personages::moveDown(Game *game, QTimer *timer)
                     game->getMap()[this->coords.y * WIDTH + this->coords.x].perPtr = this;
                 }
                 {
-                    if (mooving && game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr)
-                        game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->steps.stepUpDown = 0;
+                    if (mooving && p)
+                        p->steps.stepUpDown = 0;
                         this->steps.stepUpDown = 0;
                 }
             }
         else
             {
-                if (mooving && game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr)
-                    game->getMap()[(this->coords.y + 1) * WIDTH + this->coords.x].perPtr->steps.stepUpDown = 6;
+                if (mooving && p)
+                    p->steps.stepUpDown = 6;
                 this->steps.stepUpDown = 6;
             }
         steps = 0;
@@ -1146,7 +1267,8 @@ void Personages::setBoolShoot(bool shoot)
 void Personages::kill()
 {
     this->alive = false;
-    QTimer::singleShot(5000, [=]() { reincarnate(); });
+    this->timer = new QTimer();
+    timer->singleShot(5000, [=]() { reincarnate(); });
 }
 
 void Personages::reincarnate()

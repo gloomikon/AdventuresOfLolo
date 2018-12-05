@@ -48,6 +48,7 @@ public:
 
 
     Personages(bool shootable, int x, int y, int direction, QRect rect, QPixmap pixmap, std::string imgName);
+    ~Personages();
 
     bool            isAlive();
 

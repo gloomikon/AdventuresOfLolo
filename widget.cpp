@@ -14,9 +14,9 @@
 
 void drawMap(Game *game)
 {
-    for (int i = 5; i < 8; i++)
+    for (int i = 5; i < 10; i++)
     {
-        for (int j = 3; j < 10; j++)
+        for (int j = 4; j < 10; j++)
             qDebug() << i << j << game->getMap()[i * WIDTH + j].objPtr << " , " << game->getMap()[i * WIDTH + j].perPtr;
         qDebug() << "\n";
     }
@@ -166,7 +166,7 @@ void Widget::moving()
         this->game->getLolo()->moveRight(this->game, this->timer);
     }
     this->game->getLolo()->checkPickUp(this->game);
-    drawMap(this->game);
+    //drawMap(this->game);
     update();
 }
 
