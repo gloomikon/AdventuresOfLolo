@@ -1,6 +1,6 @@
 #include "chest.h"
 
-Chest::Chest(std::string imgName) : Objects(true, true, imgName), opened{false}, jewellery{true}
+Chest::Chest(std::string imgName, int x, int y) : Object(true, true, imgName, x, y), opened{false}, jewellery{true}
 {
 }
 

@@ -4,43 +4,55 @@
 # include "chest.h"
 # include "heart.h"
 # include "lolo.h"
+# include "snakey.h"
+# include <memory>
+
 class Widget;
+
+struct  cell
+{
+    Object     *objPtr;
+    Personage  *perPtr;
+    char        typeOfSurface;
+};
+
+class Map
+{
+private:
+    std::unique_ptr<cell[]> map;
+public:
+    Map() {map.reset(new cell[HEIGHT * WIDTH]);}
+    auto begin() {return map.get();}
+    auto end() {return map.get() + sizeof(cell) * (HEIGHT + WIDTH - 1);}
+};
 
 class Game
 {
 private:
-    struct  cell
-    {
-        Objects     *objPtr;
-        Personages  *perPtr;
-        char        typeOfSurface;
-    };
 
     int     heartsToPick;
     int     lives;
     int     level;
     bool    active;
     bool    firstDraw;
-    cell    *map;
+    Map     *map;
+    //cell    *map;
     Lolo    *lolo;
     Chest   *chest;
-    Objects *exit;
+    Object *exit;
     Widget  *w;
 public:
-
-    bool            wasHeartPicked();
-    void            setHeartPickedStatus(bool picked);
-
     Game(Widget *w);
 
     void readFromFile(std::string fileName);
     void nextLevel();
 
-    cell    *getMap();
-    Lolo    *getLolo();
-    Chest   *getChest();
+    cell*    getMap();
+    Map*     getClassMap();
+    Lolo*    getLolo();
+    Chest*   getChest();
     bool    isActive();
-    Objects *getEXit();
+    Object* getEXit();
     void    disactivate();
     void    activate();
     int     getHeartsToPick();

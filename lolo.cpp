@@ -3,8 +3,8 @@
 #include "heart.h"
 #include "widget.h"
 
-Lolo::Lolo(int x, int y, int direction, QRect rect, QPixmap pixmap, std::string imgName):
-    Personages(true, x, y, direction, rect, pixmap, imgName), shoots{0}, heartPicked{0}
+Lolo::Lolo(int x, int y, int direction, std::string imgName):
+    Personage(true, x, y, direction, imgName), shoots{0}, heartPicked{0}
 {}
 
 void Lolo::checkPickUp(Game *game)

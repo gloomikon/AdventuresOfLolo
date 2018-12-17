@@ -1,15 +1,53 @@
-#include "personages.h"
+#include "Personages.h"
 #include "game.h"
 #include <QDebug>
 #include <ctime>
 #include <cstdlib>
+#include "widget.h"
 
-Personages::Personages(bool shootable, int x, int y, int direction, QRect pRect, QPixmap pPixmap, std::string imgName):
-    Objects(shootable, false, imgName), alive{true}, shoot{false}, coords{x,y}, steps{0,0}, direction{direction},
-    pImage{pRect, pPixmap}
-{}
+Personage::Personage(bool shootable, int x, int y, int direction, std::string imgName):
+    Object(shootable, false, imgName, x, y), alive{true}, shoot{false}, steps{0,0}, direction{direction}
+{
+    QRect rect;
+    rect.setCoords(this->coords.x * SIZE,
+                   this->coords.y * SIZE,
+                   (this->coords.x + 1) * SIZE,
+                   (this->coords.y + 1) * SIZE);
+    std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
+    path += this->imgName;
+    path += ".png";
+    QPixmap pixmap(path.c_str());
+    this->pImage.rect = rect;
+    this->pImage.pixmap = pixmap;
+}
 
-Personages::~Personages()
+void Personage::drawSelf(Widget *w)
+{
+    QPainter painter(w);
+    if (this->alive)
+        painter.drawPixmap(this->pImage.rect, this->pImage.pixmap);
+    else
+    {
+        QPixmap pixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/rip.png");
+        painter.drawPixmap(this->pImage.rect, pixmap);
+    }
+}
+
+void Personage::doAction()
+{
+}
+
+void Personage::setImgName(std::string imgName)
+{
+    this->imgName = imgName;
+    std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
+    path += this->imgName;
+    path += ".png";
+    QPixmap pixmap(path.c_str());
+    this->pImage.pixmap = pixmap;
+}
+
+Personage::~Personage()
 {
     if (this->timer)
     {
@@ -18,17 +56,17 @@ Personages::~Personages()
     }
 }
 
-bool Personages::isAlive()
+bool Personage::isAlive()
 {
     return this->alive;
 }
 
-bool Personages::madeShoot()
+bool Personage::madeShoot()
 {
     return this->shoot;
 }
 
-int Personages::canMoveLeft(Game *game, int n)
+int Personage::canMoveLeft(Game *game, int n)
 {
     if (this->steps.stepUpDown == 0)
     {
@@ -141,7 +179,7 @@ int Personages::canMoveLeft(Game *game, int n)
     return 1;
 }
 
-int Personages::canMoveRight(Game *game, int n)
+int Personage::canMoveRight(Game *game, int n)
 {
     if (this->steps.stepUpDown == 0)
     {
@@ -254,7 +292,7 @@ int Personages::canMoveRight(Game *game, int n)
     return 1;
 }
 
-int Personages::canMoveUp(Game *game, int n)
+int Personage::canMoveUp(Game *game, int n)
 {
     if (this->steps.stepLeftRight == 0)
     {
@@ -367,7 +405,7 @@ int Personages::canMoveUp(Game *game, int n)
     return 1;
 }
 
-int Personages::canMoveDown(Game *game, int n)
+int Personage::canMoveDown(Game *game, int n)
 {
     if (this->steps.stepLeftRight == 0)
     {
@@ -480,7 +518,7 @@ int Personages::canMoveDown(Game *game, int n)
     return 1;
 }
 
-void Personages::moveLeft(Game *game, QTimer *timer)
+void Personage::moveLeft(Game *game, QTimer *timer)
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -491,7 +529,7 @@ void Personages::moveLeft(Game *game, QTimer *timer)
     this->pImage.rect.getCoords(x1, y1, x2, y2);
     if (this->canMoveLeft(game))
     {
-        Personages *p = nullptr;
+        Personage *p = nullptr;
         if (this->canMoveLeft(game) > 1)
         {
             mooving = true;
@@ -615,7 +653,7 @@ void Personages::moveLeft(Game *game, QTimer *timer)
     delete y2;
 }
 
-void Personages::moveRight(Game *game, QTimer *timer)
+void Personage::moveRight(Game *game, QTimer *timer)
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -626,7 +664,7 @@ void Personages::moveRight(Game *game, QTimer *timer)
     this->pImage.rect.getCoords(x1, y1, x2, y2);
     if (this->canMoveRight(game))
     {
-        Personages *p = nullptr;
+        Personage *p = nullptr;
         if (this->canMoveRight(game) > 1)
         {
             mooving = true;
@@ -749,7 +787,7 @@ void Personages::moveRight(Game *game, QTimer *timer)
     delete y2;
 }
 
-void Personages::moveUp(Game *game, QTimer *timer)
+void Personage::moveUp(Game *game, QTimer *timer)
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -760,7 +798,7 @@ void Personages::moveUp(Game *game, QTimer *timer)
     this->pImage.rect.getCoords(x1, y1, x2, y2);
     if (this->canMoveUp(game))
     {
-        Personages *p = nullptr;
+        Personage *p = nullptr;
         if (this->canMoveUp(game) > 1)
         {
             mooving = true;
@@ -885,7 +923,7 @@ void Personages::moveUp(Game *game, QTimer *timer)
     delete y2;
 }
 
-void Personages::moveDown(Game *game, QTimer *timer)
+void Personage::moveDown(Game *game, QTimer *timer)
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -896,7 +934,7 @@ void Personages::moveDown(Game *game, QTimer *timer)
     this->pImage.rect.getCoords(x1, y1, x2, y2);
     if (this->canMoveDown(game))
     {
-        Personages *p = nullptr;
+        Personage *p = nullptr;
         if (this->canMoveDown(game) > 1)
         {
             mooving = true;
@@ -1019,7 +1057,7 @@ void Personages::moveDown(Game *game, QTimer *timer)
     delete y2;
 }
 
-int Personages::shooted(Game *game, int x, int y)
+int Personage::shooted(Game *game, int x, int y)
 {
     if ((game->getMap()[y * WIDTH + x].objPtr || game->getMap()[y * WIDTH + x].perPtr) &&
             game->getMap()[y * WIDTH + x].perPtr != this)
@@ -1034,7 +1072,7 @@ int Personages::shooted(Game *game, int x, int y)
     return 0;
 }
 
-void Personages::shootUp()
+void Personage::shootUp()
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -1073,7 +1111,7 @@ void Personages::shootUp()
     delete y2;
 }
 
-void Personages::shootDown()
+void Personage::shootDown()
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -1109,7 +1147,7 @@ void Personages::shootDown()
     delete y2;
 }
 
-void Personages::shootRight()
+void Personage::shootRight()
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -1148,7 +1186,7 @@ void Personages::shootRight()
     delete y2;
 }
 
-void Personages::shootLeft()
+void Personage::shootLeft()
 {
     int *x1 = new int;
     int *y1 = new int;
@@ -1187,91 +1225,84 @@ void Personages::shootLeft()
     delete y2;
 }
 
-Personages::Coords Personages::getCoords()
-{
-    return this->coords;
-}
-
-void Personages::setCoords(int x, int y)
-{
-    this->coords.x = x;
-    this->coords.y = y;
-}
-
-Personages::Steps Personages::getSteps()
+Steps Personage::getSteps()
 {
     return this->steps;
 }
 
-int Personages::getDirection()
+int Personage::getDirection()
 {
     return this->direction;
 }
 
-void Personages::setDirection(int direction)
+void Personage::setDirection(int direction)
 {
     this->direction = direction;
 }
 
-void Personages::setShootDirection(int shootDirection)
+void Personage::setShootDirection(int shootDirection)
 {
     this->pShoot->direction = shootDirection;
 }
 
 
-QRect Personages::getRect()
+QRect Personage::getRect()
 {
     return this->pImage.rect;
 }
 
-QPixmap Personages::getPixmap()
+QPixmap Personage::getPixmap()
 {
     std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-    path += this->getImgName();
+    path += this->imgName;
     path += ".png";
     QPixmap pixmap(path.c_str());
     this->pImage.pixmap = pixmap;
     return this->pImage.pixmap;
 }
 
-QTimer *Personages::getTimer()
+QTimer *Personage::getTimer()
 {
     return this->timer;
 }
 
-void Personages::setTimer(QTimer *timer)
+void Personage::setTimer(QTimer *timer)
 {
     this->timer = timer;
 }
 
-Personages::Image Personages::getSImage()
+Image Personage::getSImage()
 {
     return this->pShoot->image;
 }
 
-void Personages::createShoot()
+void Personage::createShoot()
 {
     this->pShoot = new (Shoot);
 }
 
-Personages::Shoot *Personages::getShoot()
+Shoot *Personage::getShoot()
 {
     return this->pShoot;
 }
 
-void Personages::setBoolShoot(bool shoot)
+void Personage::setBoolShoot(bool shoot)
 {
     this->shoot = shoot;
 }
 
-void Personages::kill()
+void Personage::kill()
 {
     this->alive = false;
     this->timer = new QTimer();
-    timer->singleShot(5000, [=]() { reincarnate(); });
+    try {
+            timer->singleShot(5000, [=]() { reincarnate(); });
+    } catch (...) {
+        //do Nothing
+    }
 }
 
-void Personages::reincarnate()
+void Personage::reincarnate()
 {
     this->alive = true;
 }

@@ -31,6 +31,9 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     connectTimers();
     this->timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(moving()));
+    QTimer *actionTimer = new QTimer(this);
+    connect(actionTimer, SIGNAL(timeout()), this, SLOT(acting()));
+    actionTimer->start(1000);
 }
 
 
@@ -44,8 +47,7 @@ void Widget::drawSurface()
 }
 void Widget::drawLolo()
 {
-    QPainter painter(this);
-    painter.drawPixmap(this->game->getLolo()->getRect(), this->game->getLolo()->getPixmap());
+    this->game->getLolo()->drawSelf(this);
 }
 
 void Widget::connectTimers()
@@ -109,7 +111,7 @@ void Widget::drawShoots()
     update();
 }
 
-void Widget::updBg(Personages *p)
+void Widget::updBg(Personage *p)
 {
     for (int i = -1; i < 2; i++)
         for (int j = -1; j < 2; j++)
@@ -118,7 +120,7 @@ void Widget::updBg(Personages *p)
         }
 }
 
-void Widget::updShootBg(Personages *p)
+void Widget::updShootBg(Personage *p)
 {
     this->drawCell(p->getShoot()->coords.x, p->getShoot()->coords.y);
     drawCell(p->getCoords().x, p->getCoords().y, p);
@@ -166,6 +168,7 @@ void Widget::moving()
         this->game->getLolo()->moveRight(this->game, this->timer);
     }
     this->game->getLolo()->checkPickUp(this->game);
+
     //drawMap(this->game);
     update();
 }
@@ -194,16 +197,21 @@ void Widget::shooting()
     }
 }
 
-void Widget::drawCell(int x, int y, Personages *p)
+void Widget::acting()
+{
+    for (int i = 0; i < HEIGHT; i++)
+        for (int j = 0; j < WIDTH; j++)
+            if (this->game->getMap()[i * HEIGHT + j].perPtr)
+                this->game->getMap()[i * HEIGHT + j].perPtr->doAction();
+}
+
+void Widget::drawCell(int x, int y, Personage *p)
 {
     if (x < 0 || y < 0)
         return;
     QPainter painter(this);
     QRect rect;
-    std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-    path += this->game->getMap()[y * WIDTH + x].typeOfSurface;
-    path += ".png";
-    QPixmap pixmap(path.c_str());
+    QPixmap pixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/f.png");
     rect.setCoords(x * SIZE,
                    y * SIZE,
                    (x + 1) * SIZE,
@@ -211,38 +219,15 @@ void Widget::drawCell(int x, int y, Personages *p)
     painter.drawPixmap(rect, pixmap);
     if (this->game->getMap()[y * WIDTH + x].objPtr)
     {
-        std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-        path += this->game->getMap()[y * WIDTH + x].objPtr->getImgName();
-        path += ".png";
-        QPixmap pixmap(path.c_str());
-        painter.drawPixmap(rect, pixmap);
+        this->game->getMap()[y * WIDTH + x].objPtr->drawSelf(this);
     }
     if (this->game->getMap()[y * WIDTH + x].perPtr && this->game->getMap()[y * WIDTH + x].perPtr != p)
     {
-        std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
-        if (this->game->getMap()[y * WIDTH + x].perPtr && this->game->getMap()[y * WIDTH + x].perPtr->isAlive())
-            path += this->game->getMap()[y * WIDTH + x].perPtr->getImgName();
-        else
-            path += "rip";
-        path += ".png";
-        QPixmap pixmap(path.c_str());
-        painter.drawPixmap(this->game->getMap()[y * WIDTH + x].perPtr->getRect(), pixmap);
+        this->game->getMap()[y * WIDTH + x].perPtr->drawSelf(this);
     }
     if (p)
     {
-        int *cx1 = new int;
-        int *cx2 = new int;
-        int *cy1 = new int;
-        int *cy2 = new int;
-        QRect rect;
-        QPainter painter(this);
-        p->getRect().getCoords(cx1, cy1, cx2, cy2);
-        rect.setCoords(*cx1, *cy1, *cx2, *cy2);
-        painter.drawPixmap(rect, p->getPixmap());
-        delete cx1;
-        delete cx2;
-        delete cy1;
-        delete cy2;
+        p->drawSelf(this);
     }
 }
 void Widget::keyPressEvent(QKeyEvent *e)

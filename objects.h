@@ -4,27 +4,40 @@
 # define WIDTH 13
 # define SIZE 128
 
+# include "drawable.h"
 # include <iostream>
 # include <QObject>
+# include <QRect>
+# include <QPixmap>
 
+struct Coords
+{
+    int x;
+    int y;
+};
 
-class Objects
+class Widget;
+
+class Object : public Drawable
 {
 private:
 protected:
     bool            shootable;
     bool            walkable;
     std::string     imgName;
+    Coords          coords;
 public:
-    Objects(bool shootable, bool walkable, std::string imgName);
+    Object(bool shootable, bool walkable, std::string imgName, int x, int y);
+    void        drawSelf(Widget *w) override;
+    virtual     ~Object() = default;
 
     bool        isShootable();
     bool        isWalkable();
-    void        setImgName(std::string imgName);
+    virtual void        setImgName(std::string imgName);
     void        makeWalkable();
-    std::string getImgName();
-
-    virtual ~Objects() = default;
+    std::string getImgName();  
+    Coords      getCoords();
+    void        setCoords(int x, int y);
 };
 
 #endif // OBJECTS_H

@@ -3,13 +3,13 @@
 
 #include "objects.h"
 
-class Chest : public Objects
+class Chest : public Object
 {
 private:
     bool    opened;
     bool    jewellery;
 public:
-    Chest(std::string imgName);
+    Chest(std::string imgName, int x, int y);
     bool    isOpened();
     bool    hasJewellery();
     void    open();

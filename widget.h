@@ -17,16 +17,17 @@ class Widget : public QWidget
 public slots:
     void        moving();
     void        shooting();
+    void        acting();
 
 private:
     Ui::Widget  *ui;
     Game        *game;
-    void        drawCell(int x, int y, Personages *p = nullptr);
+    void        drawCell(int x, int y, Personage *p = nullptr);
     void        drawSurface();
     void        drawObjects();
     void        drawShoots();
-    void        updBg(Personages *p);
-    void        updShootBg(Personages *p);
+    void        updBg(Personage *p);
+    void        updShootBg(Personage *p);
     void        drawLolo();
     QTimer      *timer;
 

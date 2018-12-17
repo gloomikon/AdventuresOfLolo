@@ -1,54 +1,45 @@
 #ifndef PERSONAGES_H
 # define PERSONAGES_H
 # include "objects.h"
-# include <QRect>
-# include <QPixmap>
 # include <QTimer>
 
+struct Image
+{
+    QRect   rect;
+    QPixmap pixmap;
+};
+struct Steps
+{
+    int stepUpDown;
+    int stepLeftRight;
+};
+struct Shoot
+{
+    Coords  coords;
+    Image   image;
+    int     direction;
+};
 
 class Game;
 
-class Personages : public Objects
+class Personage : public Object
 {
-private:
-    struct Coords
-    {
-        int x;
-        int y;
-    };
-
-    struct Steps
-    {
-        int stepUpDown;
-        int stepLeftRight;
-    };
-    struct Image
-    {
-        QRect   rect;
-        QPixmap pixmap;
-    };
-    struct Shoot
-    {
-        Coords  coords;
-        Image   image;
-        int     direction;
-    };
-
+protected:
     bool        alive;
     bool        shoot;
-    Coords      coords;
     Steps       steps;
     int         direction;
-    Image       pImage;
     Shoot       *pShoot;
     QTimer      *timer;
-
-protected:
+    Image       pImage;
+private:
 public:
 
-
-    Personages(bool shootable, int x, int y, int direction, QRect rect, QPixmap pixmap, std::string imgName);
-    ~Personages();
+    Personage(bool shootable, int x, int y, int direction, std::string imgName);
+    virtual void drawSelf(Widget *w) override;
+    virtual void doAction();
+    virtual void setImgName(std::string imgName) override final;
+    virtual ~Personage() override;
 
     bool            isAlive();
 
@@ -71,9 +62,6 @@ public:
     void            shootRight();
     void            shootLeft();
 
-
-    Coords          getCoords();
-    void            setCoords(int x, int y);
 
     Steps           getSteps();
     void            setSteps(int stepUpDown, int stepLeftRight);

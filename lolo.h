@@ -3,13 +3,13 @@
 
 # include "personages.h"
 
-class Lolo : public Personages
+class Lolo : public Personage
 {
 private:
     int    shoots;
     int    heartPicked;
 public:
-    Lolo(int x, int y, int direction, QRect rect, QPixmap pixmap, std::string imgName);
+    Lolo(int x, int y, int direction, std::string imgName);
     void    checkPickUp(Game *game);
 };
 

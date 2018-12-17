@@ -3,11 +3,11 @@
 
 #include "objects.h"
 
-class Heart : public Objects
+class Heart : public Object
 {
 private:
 public:
-    Heart(std::string imgName);
+    Heart(std::string imgName, int x, int y);
 };
 
 #endif // HEART_H

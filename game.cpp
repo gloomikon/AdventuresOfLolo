@@ -8,10 +8,15 @@ static const std::string LVL_PATH = "C://Users/gloomikon/Documents/AndenturesOfL
 
 Game::Game(Widget *w) : lives{5}, level{1}, active{true}, firstDraw{true}, w{w}
 {
+    this->map = new Map;
     std::string s;
     s = std::to_string(this->level) + ".txt";
     readFromFile(s);
 }
+
+enum class CellType : char {
+    Floor = 'f',
+};
 
 void Game::readFromFile(std::string fileName)
 {
@@ -23,71 +28,58 @@ void Game::readFromFile(std::string fileName)
 
     file.open(LVL_PATH + fileName);
     file >> x >> y;
-    this->map = new Game::cell[static_cast<unsigned int>(x * y)];
     for (int i = 0; i < y; i++)
         for (int j = 0; j < x; j++)
         {
             file >> c;
-            this->map[i * x + j].typeOfSurface = 'f';
-            this->map[i * x + j].objPtr = nullptr;
-            this->map[i * x + j].perPtr = nullptr;
+            this->map->begin()[i * x + j].typeOfSurface = static_cast<char>(CellType::Floor);
+            this->map->begin()[i * x + j].objPtr = nullptr;
+            this->map->begin()[i * x + j].perPtr = nullptr;
             switch (c)
             {
             case '.':
             {
-               this->map[i * x + j].objPtr = new Objects(false, false, "wall");
+               this->map->begin()[i * x + j].objPtr = new Object(false, false, "wall", j, i);
                break;
             }
             case 'E':
             {
-               this->map[i * x + j].objPtr = new Objects(false, false, "exit");
-                this->exit = this->map[i * x + j].objPtr;
+               this->map->begin()[i * x + j].objPtr = new Object(false, false, "exit", j , i);
+                this->exit = this->map->begin()[i * x + j].objPtr;
                break;
             }
             case 'R':
             {
-                this->map[i * x + j].objPtr = new Objects(false, false, "rock");
+                this->map->begin()[i * x + j].objPtr = new Object(false, false, "rock", j ,i);
                 break;
             }
             case 'T':
             {
-                this->map[i * x + j].objPtr = new Objects(true, false, "tree");
+                this->map->begin()[i * x + j].objPtr = new Object(true, false, "tree", j, i);
                 break;
             }
             case 'S':
             {
-                QRect rect;
-                rect.setCoords(j * SIZE,
-                               i * SIZE,
-                               (j + 1) * SIZE,
-                               (i + 1) * SIZE);
-                QPixmap pixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/snakey");
-                this->map[i * x + j].perPtr = new Personages(0, j, i, 9, rect, pixmap, "snakey");
+                this->map->begin()[i * x + j].perPtr = new Snakey(j, i, 9, "snakey");
                 break;
             }
             case 'H':
             {
-                this->map[i * x + j].objPtr = new Heart("heart");
+                this->map->begin()[i * x + j].objPtr = new Heart("heart", j, i);
                 this->heartsToPick++;
                 break;
             }
             case 'L':
             {
-                QRect rect;
-                rect.setCoords(j * SIZE,
-                               i * SIZE,
-                               (j + 1) * SIZE,
-                               (i + 1) * SIZE);
-                QPixmap pixmap("C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/lolo");
-                this->map[i * x + j].perPtr = new Lolo(j,i,6,rect,pixmap, "lolo");
-                this->lolo = static_cast<Lolo*>(this->map[i * x + j].perPtr);
+                this->map->begin()[i * x + j].perPtr = new Lolo(j,i,6, "lolo");
+                this->lolo = static_cast<Lolo*>(this->map->begin()[i * x + j].perPtr);
                 this->lolo->makeWalkable();
                 break;
             }
             case 'C':
             {
-                this->map[i * x + j].objPtr = new Chest("chest01");
-                this->chest = static_cast<Chest*>(this->map[i * x + j].objPtr);
+                this->map->begin()[i * x + j].objPtr = new Chest("chest01", j, i);
+                this->chest = static_cast<Chest*>(this->map->begin()[i * x + j].objPtr);
                 break;
             }
             default:
@@ -103,20 +95,24 @@ void Game::nextLevel()
 {
     for (unsigned int i = 0; i < HEIGHT * WIDTH; i++)
     {
-        if (this->map[i].objPtr)
-            delete (this->map[i].objPtr);
-        if (this->map[i].perPtr)
-            delete (this->map[i].perPtr);
+        if (this->map->begin()[i].objPtr)
+            delete (this->map->begin()[i].objPtr);
+        if (this->map->begin()[i].perPtr)
+            delete (this->map->begin()[i].perPtr);
     }
-    delete map;
     std::string s;
     s = std::to_string(this->level) + ".txt";
     readFromFile(s);
     this->firstDraw = true;
 }
-Game::cell *Game::getMap()
+cell *Game::getMap()
 {
-    return this->map;
+    return this->map->begin();
+}
+
+Map* Game::getClassMap()
+{
+    return  this->map;
 }
 
 Lolo *Game::getLolo()
@@ -134,7 +130,7 @@ bool Game::isActive()
     return this->active;
 }
 
-Objects *Game::getEXit()
+Object *Game::getEXit()
 {
     return this->exit;
 }
@@ -168,10 +164,10 @@ void Game::clear()
 {
     for (unsigned int i = 0; i < HEIGHT * WIDTH; i++)
     {
-        if (this->map[i].perPtr && this->map[i].perPtr != this->lolo)
+        if (this->map->begin()[i].perPtr && this->map->begin()[i].perPtr != this->lolo)
         {
-            delete (this->map[i].perPtr);
-            this->map[i].perPtr = nullptr;
+            delete (this->map->begin()[i].perPtr);
+            this->map->begin()[i].perPtr = nullptr;
         }
     }
 }
@@ -186,10 +182,9 @@ Game::~Game()
 {
     for (unsigned int i = 0; i < HEIGHT * WIDTH; i++)
     {
-        if (this->map[i].objPtr)
-            delete (this->map[i].objPtr);
-        if (this->map[i].perPtr)
-            delete (this->map[i].perPtr);
+        if (this->map->begin()[i].objPtr)
+            delete (this->map->begin()[i].objPtr);
+        if (this->map->begin()[i].perPtr)
+            delete (this->map->begin()[i].perPtr);
     }
-    delete map;
 }

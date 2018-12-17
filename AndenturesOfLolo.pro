@@ -30,7 +30,9 @@ SOURCES += \
     lolo.cpp \
     game.cpp \
     heart.cpp \
-    chest.cpp
+    chest.cpp \
+    drawable.cpp \
+    snakey.cpp
 
 HEADERS += \
         widget.h \
@@ -39,7 +41,9 @@ HEADERS += \
     lolo.h \
     game.h \
     heart.h \
-    chest.h
+    chest.h \
+    drawable.h \
+    snakey.h
 
 FORMS += \
         widget.ui
