@@ -36,6 +36,7 @@ protected:
     void    keyPressEvent(QKeyEvent *);
 public:
     void        connectTimers();
+    Game*       getGame();
     explicit Widget(QWidget *parent = nullptr);
     ~Widget();
 

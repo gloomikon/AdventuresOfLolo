@@ -5,8 +5,6 @@
 class Snakey : public Personage
 {
 private:
-    int    shoots;
-    int    heartPicked;
 public:
     Snakey(int x, int y, int direction, std::string imgName);
     virtual void doAction() override final;

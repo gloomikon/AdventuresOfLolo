@@ -5,6 +5,7 @@
 # include "heart.h"
 # include "lolo.h"
 # include "snakey.h"
+# include "gol.h"
 # include <memory>
 
 class Widget;
@@ -35,8 +36,8 @@ private:
     int     level;
     bool    active;
     bool    firstDraw;
-    Map     *map;
-    //cell    *map;
+    //Map     *map;
+    std::shared_ptr<cell[]> map;
     Lolo    *lolo;
     Chest   *chest;
     Object *exit;
@@ -45,9 +46,10 @@ public:
     Game(Widget *w);
 
     void readFromFile(std::string fileName);
+    void restartLevel();
     void nextLevel();
 
-    cell*    getMap();
+    std::shared_ptr<cell[]>    getMap();
     Map*     getClassMap();
     Lolo*    getLolo();
     Chest*   getChest();
@@ -58,6 +60,9 @@ public:
     int     getHeartsToPick();
     bool    getFirstDraw();
     void    setFirstDraw(bool f);
+    void    setLvl(int lvl);
+    int     getLives();
+    void     setLives(int lives);
     void    clear();
     Widget *getWidget();
     ~Game();

@@ -84,7 +84,7 @@ public:
     Shoot           *getShoot();
 
     void            setBoolShoot(bool shoot);
-    void            kill();
+    virtual void            kill(Game*);
     void            reincarnate();
 };
 

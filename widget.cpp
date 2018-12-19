@@ -3,6 +3,7 @@
 #include "game.h"
 #include "heart.h"
 
+#include <iostream>
 #include <fstream>
 #include <QMessageBox>
 #include <QPainter>
@@ -14,10 +15,10 @@
 
 void drawMap(Game *game)
 {
-    for (int i = 5; i < 10; i++)
+    for (int i = 3; i < 5; i++)
     {
-        for (int j = 4; j < 10; j++)
-            qDebug() << i << j << game->getMap()[i * WIDTH + j].objPtr << " , " << game->getMap()[i * WIDTH + j].perPtr;
+        for (int j = 1; j < 3; j++)
+            qDebug() << i << j << game->getMap()[i * WIDTH + j].perPtr;
         qDebug() << "\n";
     }
 }
@@ -33,7 +34,7 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     connect(timer, SIGNAL(timeout()), this, SLOT(moving()));
     QTimer *actionTimer = new QTimer(this);
     connect(actionTimer, SIGNAL(timeout()), this, SLOT(acting()));
-    actionTimer->start(1000);
+    actionTimer->start(20);
 }
 
 
@@ -58,6 +59,11 @@ void Widget::connectTimers()
             this->game->getMap()[i].perPtr->setTimer(new QTimer(this));
             connect(this->game->getMap()[i].perPtr->getTimer(), SIGNAL(timeout()), this, SLOT(shooting()));
         }
+}
+
+Game *Widget::getGame()
+{
+    return this->game;
 }
 void Widget::drawObjects()
 {
@@ -96,15 +102,20 @@ void Widget::drawShoots()
                                                                         this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x,
                                                                         this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y))
                 {
+                    this->drawCell(this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x, this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y);
+                    this->game->getMap()[i * WIDTH + j].perPtr->getTimer()->stop();
+                    this->game->getMap()[i * WIDTH + j].perPtr->setBoolShoot(false);
                     if (this->game->getMap()[i * WIDTH + j].perPtr->shooted(this->game,
                                                                             this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x,
                                                                             this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y) == 2)
-                        this->game->getMap()[this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y * WIDTH + this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x].perPtr->kill();
-                    this->drawCell(this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x,
-                                   this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y);
-                    this->game->getMap()[i * WIDTH + j].perPtr->getTimer()->stop();
-                    this->game->getMap()[i * WIDTH + j].perPtr->setBoolShoot(false);
-                    delete this->game->getMap()[i * WIDTH + j].perPtr->getShoot();
+                    {
+
+                        this->game->getMap()[this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y * WIDTH + this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x].perPtr->kill(this->game);
+                    }
+
+
+                        delete this->game->getMap()[i * WIDTH + j].perPtr->getShoot();
+
                 }
             }
         }
@@ -123,23 +134,19 @@ void Widget::updBg(Personage *p)
 void Widget::updShootBg(Personage *p)
 {
     this->drawCell(p->getShoot()->coords.x, p->getShoot()->coords.y);
-    drawCell(p->getCoords().x, p->getCoords().y, p);
-    if (abs(p->getCoords().x - p->getShoot()->coords.x) <= 1 && abs(p->getCoords().y - p->getShoot()->coords.y) <= 1)
-    {
-        this->drawCell(p->getShoot()->coords.x, p->getShoot()->coords.y, p);
-    }
+    this->drawCell(p->getCoords().x, p->getCoords().y, p);
 }
 void Widget::paintEvent(QPaintEvent *)
 {
     if (this->game->isActive())
     {
-        if (game->getFirstDraw())
+       if (game->getFirstDraw())
         {
             this->drawSurface();
             game->setFirstDraw(false);
         }
-        this->updBg(this->game->getLolo());
         this->drawObjects();
+        this->updBg(this->game->getLolo());
         this->drawLolo();
         this->drawShoots();
     }
@@ -199,15 +206,22 @@ void Widget::shooting()
 
 void Widget::acting()
 {
+    /*for (auto c = std::begin(*this->game->getSharedPtrMap()); c!=std::end(*this->game->getSharedPtrMap()); ++c)
+        if (c->perPtr)
+            c->perPtr->doAction();*/
+    /*for (auto c : *this->game->getClassMap())
+        if (c.perPtr)
+            c.perPtr->doAction();*/
     for (int i = 0; i < HEIGHT; i++)
         for (int j = 0; j < WIDTH; j++)
             if (this->game->getMap()[i * HEIGHT + j].perPtr)
                 this->game->getMap()[i * HEIGHT + j].perPtr->doAction();
+
 }
 
 void Widget::drawCell(int x, int y, Personage *p)
 {
-    if (x < 0 || y < 0)
+    if (x < 0 || y < 0 || x > WIDTH - 1 || y > WIDTH - 1)
         return;
     QPainter painter(this);
     QRect rect;
@@ -232,7 +246,7 @@ void Widget::drawCell(int x, int y, Personage *p)
 }
 void Widget::keyPressEvent(QKeyEvent *e)
 {
-    if(this->game->isActive())
+    if(this->game->isActive() && this->game->getLolo()->isAlive())
     {
         if (e->key() == Qt::Key_S || e->key() == Qt::Key_Down)
         {
@@ -272,12 +286,17 @@ void Widget::keyPressEvent(QKeyEvent *e)
         }
         else if (e->key() == Qt::Key_Space)
         {
-            if (!this->game->getLolo()->getTimer()->isActive())
+            if (!this->game->getLolo()->getTimer()->isActive() && this->game->getLolo()->getShoots() > 0)
             {
+                this->game->getLolo()->setShoots(this->game->getLolo()->getShoots() - 1);
                 this->game->getLolo()->createShoot();
                 this->game->getLolo()->setShootDirection(this->game->getLolo()->getDirection());
                 this->game->getLolo()->getTimer()->start(10);
             }
+        }
+        else if (e->key() == Qt::Key_Shift)
+        {
+            this->game->getLolo()->suicide(this->game);
         }
     }
 }

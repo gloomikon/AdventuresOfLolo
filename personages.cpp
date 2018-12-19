@@ -1,4 +1,4 @@
-#include "Personages.h"
+#include "personages.h"
 #include "game.h"
 #include <QDebug>
 #include <ctime>
@@ -323,7 +323,8 @@ int Personage::canMoveUp(Game *game, int n)
              (game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1].perPtr &&
               game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepLeftRight == 9 &&
               game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == 12)  ||
-             (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - 1].perPtr &&
+                 ((this->coords.y - 2 + k >= 0) &&
+             ((game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - 1].perPtr &&
               game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepLeftRight == 3 &&
               game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - 1].perPtr->getSteps().stepUpDown == 6)||
                  (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr &&
@@ -331,7 +332,7 @@ int Personage::canMoveUp(Game *game, int n)
                   game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr->isAlive()) ||
              (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1].perPtr &&
               game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepLeftRight == 9 &&
-              game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == 6)))
+              game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1].perPtr->getSteps().stepUpDown == 6)))))
             return 0;
             if (this->steps.stepUpDown == 0 &&
                 ((game->getMap()[(this->coords.y - 1) * WIDTH + this->coords.x].perPtr &&
@@ -352,7 +353,7 @@ int Personage::canMoveUp(Game *game, int n)
                 return 0;
             }
 
-            if (this->steps.stepUpDown != 0 &&
+            if (this->coords.y > 1 && this->steps.stepUpDown != 0 &&
                     (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr &&
                     !game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr->isAlive() &&
                      game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x].perPtr->steps.stepUpDown == 6))
@@ -393,12 +394,13 @@ int Personage::canMoveUp(Game *game, int n)
                 (game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1 - j].perPtr &&
                  game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1 - j].perPtr != this &&
                   game->getMap()[(this->coords.y - 1 + k) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepLeftRight != 3) ||
-                         (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - j].perPtr &&
+                         ((this->coords.y > 1) &&
+                         ((game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - j].perPtr &&
                            game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x - j].perPtr->getSteps().stepLeftRight != 9 &&
                           game->getMap()[(this->coords.y  - 2 + k) * WIDTH + this->coords.x - j].perPtr->getSteps().stepUpDown == 6) ||
                          (game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1 - j].perPtr &&
                            game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepLeftRight != 3 &&
-                          game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepUpDown == 6)))
+                          game->getMap()[(this->coords.y - 2 + k) * WIDTH + this->coords.x + 1 - j].perPtr->getSteps().stepUpDown == 6)))))
             return 0;
 
     }
@@ -1133,8 +1135,8 @@ void Personage::shootDown()
     }
     this->pShoot->image.rect.getCoords(x1, y1, x2, y2);
     {
-        this->pShoot->image.rect.moveTop(*y1 + 16);
-        steps+=16;
+        this->pShoot->image.rect.moveTop(*y1 + SIZE/8);
+        steps+=SIZE/8;
         if (steps == SIZE)
         {
             this->pShoot->coords.y++;
@@ -1279,6 +1281,7 @@ Image Personage::getSImage()
 void Personage::createShoot()
 {
     this->pShoot = new (Shoot);
+    //this->shoot = true;
 }
 
 Shoot *Personage::getShoot()
@@ -1291,15 +1294,12 @@ void Personage::setBoolShoot(bool shoot)
     this->shoot = shoot;
 }
 
-void Personage::kill()
+void Personage::kill(Game*)
 {
     this->alive = false;
     this->timer = new QTimer();
-    try {
-            timer->singleShot(5000, [=]() { reincarnate(); });
-    } catch (...) {
-        //do Nothing
-    }
+    timer->singleShot(5000, [=]() { reincarnate(); });
+
 }
 
 void Personage::reincarnate()

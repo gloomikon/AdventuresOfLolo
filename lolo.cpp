@@ -12,6 +12,7 @@ void Lolo::checkPickUp(Game *game)
     if (game->getMap()[this->getCoords().y * WIDTH + this->getCoords().x].objPtr &&
             dynamic_cast<Heart*>(game->getMap()[this->getCoords().y * WIDTH + this->getCoords().x].objPtr))
     {
+        this->shoots += 2;
         this->heartPicked++;
         if (this->heartPicked == game->getHeartsToPick())
             game->getChest()->open();
@@ -36,4 +37,28 @@ void Lolo::checkPickUp(Game *game)
         game->getWidget()->connectTimers();
         game->activate();
     }
+}
+
+int Lolo::getShoots()
+{
+    return this->shoots;
+}
+
+void Lolo::setShoots(int shoots)
+{
+    this->shoots = shoots;
+}
+
+void Lolo::suicide(Game *game)
+{
+    game->disactivate();
+    game->setLives(game->getLives() - 1);
+    if (game->getLives() == 0)
+    {
+        game->setLvl(1);
+        game->setLives(5);
+    }
+    game->restartLevel();
+    game->getWidget()->connectTimers();
+    game->activate();
 }
