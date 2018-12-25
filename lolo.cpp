@@ -7,38 +7,6 @@ Lolo::Lolo(int x, int y, int direction, std::string imgName):
     Personage(true, x, y, direction, imgName), shoots{0}, heartPicked{0}
 {}
 
-void Lolo::checkPickUp(Game *game)
-{
-    if (game->getMap()[this->getCoords().y * WIDTH + this->getCoords().x].objPtr &&
-            dynamic_cast<Heart*>(game->getMap()[this->getCoords().y * WIDTH + this->getCoords().x].objPtr))
-    {
-        this->shoots += 2;
-        this->heartPicked++;
-        if (this->heartPicked == game->getHeartsToPick())
-            game->getChest()->open();
-        delete dynamic_cast<Heart*>(game->getMap()[this->getCoords().y * WIDTH + this->getCoords().x].objPtr);
-        game->getMap()[this->getCoords().y * WIDTH + this->getCoords().x].objPtr = nullptr;
-    }
-    if (game->getMap()[this->getCoords().y * WIDTH + this->getCoords().x].objPtr &&
-        game->getMap()[this->getCoords().y * WIDTH + this->getCoords().x].objPtr == game->getChest() &&
-            game->getChest()->isOpened() && game->getChest()->hasJewellery())
-    {
-        game->getChest()->finish();
-        game->clear();
-        game->getEXit()->setImgName("exitopen");
-        game->getEXit()->makeWalkable();
-        game->setFirstDraw(true);
-    }
-    if (game->getMap()[this->getCoords().y * WIDTH + this->getCoords().x].objPtr &&
-        game->getMap()[this->getCoords().y * WIDTH + this->getCoords().x].objPtr == game->getEXit())
-    {
-        game->disactivate();
-        game->nextLevel();
-        game->getWidget()->connectTimers();
-        game->activate();
-    }
-}
-
 int Lolo::getShoots()
 {
     return this->shoots;
@@ -47,6 +15,16 @@ int Lolo::getShoots()
 void Lolo::setShoots(int shoots)
 {
     this->shoots = shoots;
+}
+
+int Lolo::getHeartsPicked()
+{
+    return this->heartPicked;
+}
+
+void Lolo::setHeartsPicked(int hearts)
+{
+    this->heartPicked = hearts;
 }
 
 void Lolo::suicide(Game *game)

@@ -3,8 +3,11 @@
 #include "widget.h"
 
 Object::Object(bool shootable, bool walkable, std::string imgName, int x, int y):
-    shootable{shootable}, walkable{walkable}, imgName{imgName}, coords{x,y}
+    shootable{shootable}, walkable{walkable}, imgName{imgName}
 {
+    this->coords = new Coords;
+    this->coords->x = x;
+    this->coords->y = y;
 }
 
 bool Object::isShootable()
@@ -32,25 +35,30 @@ std::string Object::getImgName()
     return this->imgName;
 }
 
-Coords Object::getCoords()
+Coords *Object::getCoords()
 {
     return this->coords;
 }
 
 void Object::setCoords(int x, int y)
 {
-    this->coords.x = x;
-    this->coords.y = y;
+    this->coords->x = x;
+    this->coords->y = y;
+}
+
+Object::~Object()
+{
+
 }
 
 void Object::drawSelf(Widget *w)
 {
     QPainter painter(w);
     QRect rect;
-    rect.setCoords(this->coords.x * SIZE,
-                   this->coords.y * SIZE,
-                   (this->coords.x+1) * SIZE,
-                   (this->coords.y+1) * SIZE);
+    rect.setCoords(this->coords->x * SIZE,
+                   this->coords->y * SIZE,
+                   (this->coords->x+1) * SIZE,
+                   (this->coords->y+1) * SIZE);
     std::string path= "C://Users/gloomikon/Documents/AndenturesOfLolo/imgs/";
     path += this->imgName;
     path += ".png";

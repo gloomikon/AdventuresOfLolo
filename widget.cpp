@@ -28,7 +28,7 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     this->setFixedSize(WIDTH*SIZE,HEIGHT*SIZE);
     this->setAttribute(Qt::WA_OpaquePaintEvent);
     this->setWindowTitle("Adventures of Lolo by KOLUMBIA");
-    this->game = new Game(this);
+    Game::Instance(this);
     connectTimers();
     this->timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(moving()));
@@ -48,41 +48,37 @@ void Widget::drawSurface()
 }
 void Widget::drawLolo()
 {
-    this->game->getLolo()->drawSelf(this);
+    Game::Instance(this).getLolo()->drawSelf(this);
 }
 
 void Widget::connectTimers()
 {
     for (int i = 0; i < WIDTH * HEIGHT; i++)
-        if (this->game->getMap()[i].perPtr)
+        if (Game::Instance(this).getMap()[i].perPtr)
         {
-            this->game->getMap()[i].perPtr->setTimer(new QTimer(this));
-            connect(this->game->getMap()[i].perPtr->getTimer(), SIGNAL(timeout()), this, SLOT(shooting()));
+            Game::Instance(this).getMap()[i].perPtr->setTimer(new QTimer(this));
+            connect(Game::Instance(this).getMap()[i].perPtr->getTimer(), SIGNAL(timeout()), this, SLOT(shooting()));
         }
 }
 
-Game *Widget::getGame()
-{
-    return this->game;
-}
 void Widget::drawObjects()
 {
     for (int i = 0; i < HEIGHT; i++)
         for (int j = 0; j < WIDTH; j++)
         {
-            if (this->game->getMap()[i * WIDTH + j].perPtr && !dynamic_cast<Lolo*>(this->game->getMap()[i * WIDTH + j].perPtr))
+            if (Game::Instance(this).getMap()[i * WIDTH + j].perPtr && !dynamic_cast<Lolo*>(Game::Instance(this).getMap()[i * WIDTH + j].perPtr))
             {
-                if (this->game->getMap()[i * WIDTH + j].perPtr->getSteps().stepLeftRight == 9)
+                if (Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getSteps()->stepLeftRight == 9)
                     this->drawCell(j-1,i);
-                if (this->game->getMap()[i * WIDTH + j].perPtr->getSteps().stepLeftRight == 3)
+                if (Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getSteps()->stepLeftRight == 3)
                     this->drawCell(j+1,i);
-                if (this->game->getMap()[i * WIDTH + j].perPtr->getSteps().stepUpDown == 12)
+                if (Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getSteps()->stepUpDown == 12)
                     this->drawCell(j,i-1);
-                if (this->game->getMap()[i * WIDTH + j].perPtr->getSteps().stepUpDown == 6)
+                if (Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getSteps()->stepUpDown == 6)
                     this->drawCell(j,i+1);
                                 this->drawCell(j,i);
             }
-            if (this->game->getMap()[i * WIDTH + j].objPtr == this->game->getChest())
+            if (Game::Instance(this).getMap()[i * WIDTH + j].objPtr == Game::Instance(this).getChest())
                 this->drawCell(j,i);
         }
 }
@@ -92,29 +88,29 @@ void Widget::drawShoots()
     for (int i = 0; i < HEIGHT; i++)
         for (int j = 0; j < WIDTH; j++)
         {
-            if (this->game->getMap()[i * WIDTH + j].perPtr && this->game->getMap()[i * WIDTH + j].perPtr->madeShoot())
+            if (Game::Instance(this).getMap()[i * WIDTH + j].perPtr && Game::Instance(this).getMap()[i * WIDTH + j].perPtr->madeShoot())
             {
-                updShootBg(this->game->getMap()[i * WIDTH + j].perPtr);
+                updShootBg(Game::Instance(this).getMap()[i * WIDTH + j].perPtr);
                 QPainter painter(this);
-                painter.drawPixmap(this->game->getMap()[i * WIDTH + j].perPtr->getSImage().rect,
-                        this->game->getMap()[i * WIDTH + j].perPtr->getSImage().pixmap);
-                if (this->game->getMap()[i * WIDTH + j].perPtr->shooted(this->game,
-                                                                        this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x,
-                                                                        this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y))
+                painter.drawPixmap(Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getSImage().rect,
+                        Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getSImage().pixmap);
+                if (Game::Instance(this).shooted(Game::Instance(this).getMap()[i * WIDTH + j].perPtr,
+                                                                        Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x,
+                                                                        Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y))
                 {
-                    this->drawCell(this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x, this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y);
-                    this->game->getMap()[i * WIDTH + j].perPtr->getTimer()->stop();
-                    this->game->getMap()[i * WIDTH + j].perPtr->setBoolShoot(false);
-                    if (this->game->getMap()[i * WIDTH + j].perPtr->shooted(this->game,
-                                                                            this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x,
-                                                                            this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y) == 2)
+                    this->drawCell(Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x, Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y);
+                    Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getTimer()->stop();
+                    Game::Instance(this).getMap()[i * WIDTH + j].perPtr->setBoolShoot(false);
+                    if (Game::Instance(this).shooted(Game::Instance(this).getMap()[i * WIDTH + j].perPtr,
+                                                                            Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x,
+                                                                            Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y) == 2)
                     {
 
-                        this->game->getMap()[this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y * WIDTH + this->game->getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x].perPtr->kill(this->game);
+                        Game::Instance(this).getMap()[Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getShoot()->coords.y * WIDTH + Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getShoot()->coords.x].perPtr->kill();
                     }
 
 
-                        delete this->game->getMap()[i * WIDTH + j].perPtr->getShoot();
+                        delete Game::Instance(this).getMap()[i * WIDTH + j].perPtr->getShoot();
 
                 }
             }
@@ -127,26 +123,26 @@ void Widget::updBg(Personage *p)
     for (int i = -1; i < 2; i++)
         for (int j = -1; j < 2; j++)
         {
-            this->drawCell(p->getCoords().x + j, p->getCoords().y + i, p);
+            this->drawCell(p->getCoords()->x + j, p->getCoords()->y + i, p);
         }
 }
 
 void Widget::updShootBg(Personage *p)
 {
     this->drawCell(p->getShoot()->coords.x, p->getShoot()->coords.y);
-    this->drawCell(p->getCoords().x, p->getCoords().y, p);
+    this->drawCell(p->getCoords()->x, p->getCoords()->y, p);
 }
 void Widget::paintEvent(QPaintEvent *)
 {
-    if (this->game->isActive())
+    if (Game::Instance(this).isActive())
     {
-       if (game->getFirstDraw())
+       if (Game::Instance(this).getFirstDraw())
         {
             this->drawSurface();
-            game->setFirstDraw(false);
+            Game::Instance(this).setFirstDraw(false);
         }
         this->drawObjects();
-        this->updBg(this->game->getLolo());
+        this->updBg(Game::Instance(this).getLolo());
         this->drawLolo();
         this->drawShoots();
     }
@@ -155,26 +151,26 @@ void Widget::paintEvent(QPaintEvent *)
 void Widget::moving()
 {
     //Down
-    if (this->game->getLolo()->getDirection() == 6)
+    if (Game::Instance(this).getLolo()->getDirection() == 6)
     {
-        this->game->getLolo()->moveDown(this->game, this->timer);
+        Game::Instance(this).moveDown(Game::Instance(this).getLolo(), this->timer);
     }
     //Up
-    else if (this->game->getLolo()->getDirection() == 12)
+    else if (Game::Instance(this).getLolo()->getDirection() == 12)
     {
-        this->game->getLolo()->moveUp(this->game, this->timer);
+        Game::Instance(this).moveUp(Game::Instance(this).getLolo(), this->timer);
     }
     //Left
-    else if (this->game->getLolo()->getDirection() == 9)
+    else if (Game::Instance(this).getLolo()->getDirection() == 9)
     {
-        this->game->getLolo()->moveLeft(this->game, this->timer);
+        Game::Instance(this).moveLeft(Game::Instance(this).getLolo(), this->timer);
     }
     //Right
-    else if (this->game->getLolo()->getDirection() == 3)
+    else if (Game::Instance(this).getLolo()->getDirection() == 3)
     {
-        this->game->getLolo()->moveRight(this->game, this->timer);
+        Game::Instance(this).moveRight(Game::Instance(this).getLolo(), this->timer);
     }
-    this->game->getLolo()->checkPickUp(this->game);
+    Game::Instance(this).checkPickUp();
 
     //drawMap(this->game);
     update();
@@ -183,39 +179,39 @@ void Widget::moving()
 void Widget::shooting()
 {
     //Up
-    if (this->game->getLolo()->getShoot()->direction == 12)
+    if (Game::Instance(this).getLolo()->getShoot()->direction == 12)
     {
-        this->game->getLolo()->shootUp();
+        Game::Instance(this).getLolo()->shootUp();
     }
     //Down
-    else if (this->game->getLolo()->getShoot()->direction == 6)
+    else if (Game::Instance(this).getLolo()->getShoot()->direction == 6)
     {
-        this->game->getLolo()->shootDown();
+        Game::Instance(this).getLolo()->shootDown();
     }
     //Right
-    else if (this->game->getLolo()->getShoot()->direction == 3)
+    else if (Game::Instance(this).getLolo()->getShoot()->direction == 3)
     {
-        this->game->getLolo()->shootRight();
+        Game::Instance(this).getLolo()->shootRight();
     }
     //Left
-    else if (this->game->getLolo()->getShoot()->direction == 9)
+    else if (Game::Instance(this).getLolo()->getShoot()->direction == 9)
     {
-        this->game->getLolo()->shootLeft();
+        Game::Instance(this).getLolo()->shootLeft();
     }
 }
 
 void Widget::acting()
 {
-    /*for (auto c = std::begin(*this->game->getSharedPtrMap()); c!=std::end(*this->game->getSharedPtrMap()); ++c)
+    /*for (auto c = std::begin(*Game::Instance(this).getSharedPtrMap()); c!=std::end(*Game::Instance(this).getSharedPtrMap()); ++c)
         if (c->perPtr)
             c->perPtr->doAction();*/
-    /*for (auto c : *this->game->getClassMap())
+    /*for (auto c : *Game::Instance(this).getClassMap())
         if (c.perPtr)
             c.perPtr->doAction();*/
     for (int i = 0; i < HEIGHT; i++)
         for (int j = 0; j < WIDTH; j++)
-            if (this->game->getMap()[i * HEIGHT + j].perPtr)
-                this->game->getMap()[i * HEIGHT + j].perPtr->doAction();
+            if (Game::Instance(this).getMap()[i * HEIGHT + j].perPtr)
+                Game::Instance(this).getMap()[i * HEIGHT + j].perPtr->doAction();
 
 }
 
@@ -231,13 +227,13 @@ void Widget::drawCell(int x, int y, Personage *p)
                    (x + 1) * SIZE,
                    (y + 1) * SIZE);
     painter.drawPixmap(rect, pixmap);
-    if (this->game->getMap()[y * WIDTH + x].objPtr)
+    if (Game::Instance(this).getMap()[y * WIDTH + x].objPtr)
     {
-        this->game->getMap()[y * WIDTH + x].objPtr->drawSelf(this);
+        Game::Instance(this).getMap()[y * WIDTH + x].objPtr->drawSelf(this);
     }
-    if (this->game->getMap()[y * WIDTH + x].perPtr && this->game->getMap()[y * WIDTH + x].perPtr != p)
+    if (Game::Instance(this).getMap()[y * WIDTH + x].perPtr && Game::Instance(this).getMap()[y * WIDTH + x].perPtr != p)
     {
-        this->game->getMap()[y * WIDTH + x].perPtr->drawSelf(this);
+        Game::Instance(this).getMap()[y * WIDTH + x].perPtr->drawSelf(this);
     }
     if (p)
     {
@@ -246,14 +242,14 @@ void Widget::drawCell(int x, int y, Personage *p)
 }
 void Widget::keyPressEvent(QKeyEvent *e)
 {
-    if(this->game->isActive() && this->game->getLolo()->isAlive())
+    if(Game::Instance(this).isActive() && Game::Instance(this).getLolo()->isAlive())
     {
         if (e->key() == Qt::Key_S || e->key() == Qt::Key_Down)
         {
             if (!this->timer->isActive())
             {
-                this->game->getLolo()->setImgName("lolo");
-                this->game->getLolo()->setDirection(6);
+                Game::Instance(this).getLolo()->setImgName("lolo");
+                Game::Instance(this).getLolo()->setDirection(6);
                 this->timer->start(10);
             }
         }
@@ -261,8 +257,8 @@ void Widget::keyPressEvent(QKeyEvent *e)
         {
             if (!this->timer->isActive())
             {
-                this->game->getLolo()->setImgName("loloup");
-                this->game->getLolo()->setDirection(12);
+                Game::Instance(this).getLolo()->setImgName("loloup");
+                Game::Instance(this).getLolo()->setDirection(12);
                 this->timer->start(10);
             }
         }
@@ -270,8 +266,8 @@ void Widget::keyPressEvent(QKeyEvent *e)
         {
             if (!this->timer->isActive())
             {
-                this->game->getLolo()->setImgName("lololeft");
-                this->game->getLolo()->setDirection(9);
+                Game::Instance(this).getLolo()->setImgName("lololeft");
+                Game::Instance(this).getLolo()->setDirection(9);
                 this->timer->start(10);
             }
         }
@@ -279,24 +275,24 @@ void Widget::keyPressEvent(QKeyEvent *e)
         {
             if (!this->timer->isActive())
             {
-                this->game->getLolo()->setImgName("loloright");
-                this->game->getLolo()->setDirection(3);
+                Game::Instance(this).getLolo()->setImgName("loloright");
+                Game::Instance(this).getLolo()->setDirection(3);
                 this->timer->start(10);
             }
         }
         else if (e->key() == Qt::Key_Space)
         {
-            if (!this->game->getLolo()->getTimer()->isActive() && this->game->getLolo()->getShoots() > 0)
+            if (!Game::Instance(this).getLolo()->getTimer()->isActive() && Game::Instance(this).getLolo()->getShoots() > 0)
             {
-                this->game->getLolo()->setShoots(this->game->getLolo()->getShoots() - 1);
-                this->game->getLolo()->createShoot();
-                this->game->getLolo()->setShootDirection(this->game->getLolo()->getDirection());
-                this->game->getLolo()->getTimer()->start(10);
+                Game::Instance(this).getLolo()->setShoots(Game::Instance(this).getLolo()->getShoots() - 1);
+                Game::Instance(this).getLolo()->createShoot();
+                Game::Instance(this).getLolo()->setShootDirection(Game::Instance(this).getLolo()->getDirection());
+                Game::Instance(this).getLolo()->getTimer()->start(10);
             }
         }
         else if (e->key() == Qt::Key_Shift)
         {
-            this->game->getLolo()->suicide(this->game);
+            Game::Instance(this).getLolo()->suicide(&Game::Instance(this));
         }
     }
 }

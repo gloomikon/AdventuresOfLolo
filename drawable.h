@@ -5,9 +5,8 @@ class Widget;
 class Drawable //Interface
 {
 public:
-    Drawable();
-    virtual void drawSelf(Widget *w);
-    //virtual ~Drawable();
+    virtual void drawSelf(Widget *w) = 0;
+    virtual ~Drawable() = 0;
 };
 
 #endif // DRAWABLE_H

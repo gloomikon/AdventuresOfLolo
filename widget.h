@@ -21,7 +21,7 @@ public slots:
 
 private:
     Ui::Widget  *ui;
-    Game        *game;
+    //Game        *game;
     void        drawCell(int x, int y, Personage *p = nullptr);
     void        drawSurface();
     void        drawObjects();
@@ -36,7 +36,7 @@ protected:
     void    keyPressEvent(QKeyEvent *);
 public:
     void        connectTimers();
-    Game*       getGame();
+    //Game*       getGame();
     explicit Widget(QWidget *parent = nullptr);
     ~Widget();
 

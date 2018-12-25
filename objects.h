@@ -25,19 +25,19 @@ protected:
     bool            shootable;
     bool            walkable;
     std::string     imgName;
-    Coords          coords;
+    Coords          *coords;
 public:
     Object(bool shootable, bool walkable, std::string imgName, int x, int y);
     void        drawSelf(Widget *w) override;
-    virtual     ~Object() = default;
 
     bool        isShootable();
     bool        isWalkable();
     virtual void        setImgName(std::string imgName);
     void        makeWalkable();
     std::string getImgName();  
-    Coords      getCoords();
+    Coords*      getCoords();
     void        setCoords(int x, int y);
+    virtual     ~Object() override ;
 };
 
 #endif // OBJECTS_H

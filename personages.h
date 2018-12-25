@@ -2,6 +2,8 @@
 # define PERSONAGES_H
 # include "objects.h"
 # include <QTimer>
+# include <iostream>
+# include <memory>
 
 struct Image
 {
@@ -27,16 +29,15 @@ class Personage : public Object
 protected:
     bool        alive;
     bool        shoot;
-    Steps       steps;
+    Steps       *steps;
     int         direction;
     Shoot       *pShoot;
-    QTimer      *timer;
-    Image       pImage;
+    QTimer      *timer = nullptr;
 private:
 public:
-
+        Image       pImage;
     Personage(bool shootable, int x, int y, int direction, std::string imgName);
-    virtual void drawSelf(Widget *w) override;
+    virtual void drawSelf(Widget *w) override final;
     virtual void doAction();
     virtual void setImgName(std::string imgName) override final;
     virtual ~Personage() override;
@@ -45,25 +46,13 @@ public:
 
     bool            madeShoot();
 
-    int             canMoveLeft(Game *game, int n = 0);
-    int             canMoveRight(Game *game, int n = 0);
-    int             canMoveUp(Game *game, int n = 0);
-    int             canMoveDown(Game *game, int n = 0);
-
-    void            moveLeft(Game *game, QTimer *timer);
-    void            moveRight(Game *game, QTimer *timer);
-    void            moveUp(Game *game, QTimer *timer);
-    void            moveDown(Game *game, QTimer *timer);
-
-    int             shooted(Game *game, int x, int y);
-
     void            shootUp();
     void            shootDown();
     void            shootRight();
     void            shootLeft();
 
 
-    Steps           getSteps();
+    Steps*           getSteps();
     void            setSteps(int stepUpDown, int stepLeftRight);
 
     int             getDirection();
@@ -84,7 +73,7 @@ public:
     Shoot           *getShoot();
 
     void            setBoolShoot(bool shoot);
-    virtual void            kill(Game*);
+    virtual void            kill();
     void            reincarnate();
 };
 

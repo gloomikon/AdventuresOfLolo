@@ -17,16 +17,6 @@ struct  cell
     char        typeOfSurface;
 };
 
-class Map
-{
-private:
-    std::unique_ptr<cell[]> map;
-public:
-    Map() {map.reset(new cell[HEIGHT * WIDTH]);}
-    auto begin() {return map.get();}
-    auto end() {return map.get() + sizeof(cell) * (HEIGHT + WIDTH - 1);}
-};
-
 class Game
 {
 private:
@@ -36,21 +26,23 @@ private:
     int     level;
     bool    active;
     bool    firstDraw;
-    //Map     *map;
     std::shared_ptr<cell[]> map;
     Lolo    *lolo;
     Chest   *chest;
     Object *exit;
     Widget  *w;
-public:
-    Game(Widget *w);
 
+     Game(Widget *w);
+    ~Game();
+    Game(Game const&) = delete;
+    Game& operator=(Game const&) = delete;
+public:
+    static Game &Instance(Widget *w);
     void readFromFile(std::string fileName);
     void restartLevel();
     void nextLevel();
 
     std::shared_ptr<cell[]>    getMap();
-    Map*     getClassMap();
     Lolo*    getLolo();
     Chest*   getChest();
     bool    isActive();
@@ -64,8 +56,19 @@ public:
     int     getLives();
     void     setLives(int lives);
     void    clear();
+    int             canMoveLeft(Personage *p, int n = 0);
+    int             canMoveRight(Personage *p, int n = 0);
+    int             canMoveUp(Personage *p, int n = 0);
+    int             canMoveDown(Personage *p, int n = 0);
+
+    void            moveLeft(Personage *p, QTimer *timer);
+    void            moveRight(Personage *p, QTimer *timer);
+    void            moveUp(Personage *p, QTimer *timer);
+    void            moveDown(Personage *p, QTimer *timer);
+    void            checkPickUp();
+
+    int             shooted(Personage *p, int x, int y);
     Widget *getWidget();
-    ~Game();
 };
 
 #endif // GAME_H
