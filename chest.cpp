@@ -1,7 +1,9 @@
 #include "chest.h"
+#include "state.h"
 
 Chest::Chest(std::string imgName, int x, int y) : Object(true, true, imgName, x, y), opened{false}, jewellery{true}
 {
+    this->current = new ClosedState;
 }
 
 bool Chest::isOpened()
@@ -14,14 +16,12 @@ bool Chest::hasJewellery()
     return this->jewellery;
 }
 
-void Chest::open()
+void Chest::perfomSth()
 {
-    this->opened = true;
-    this->setImgName("chest02");
+    current->chestAction(this);
 }
 
-void Chest::finish()
+void Chest::setCurrentState(State *s)
 {
-    this->jewellery = false;
-    this->setImgName("chest03");
+    this->current = s;
 }

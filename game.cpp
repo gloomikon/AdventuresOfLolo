@@ -6,7 +6,7 @@
 
 static const std::string LVL_PATH = "C://Users/gloomikon/Documents/AndenturesOfLolo/lvls/";
 
-Game::Game(Widget *w) : lives{5}, level{1}, active{true}, firstDraw{true}, w{w}
+Game::Game() : lives{5}, level{1}, active{true}, firstDraw{true}
 {
     //this->map = new Map;
     this->map = std::unique_ptr<cell[]>(new cell[HEIGHT * WIDTH]);
@@ -61,12 +61,12 @@ void Game::readFromFile(std::string fileName)
             }
             case 'S':
             {
-                this->map[i * x + j].perPtr = new Snakey(j, i, 9, "snakey");
+                this->map[i * x + j].perPtr = Personage::makePersonage("snakey", j, i);
                 break;
             }
             case 'G':
             {
-                this->map[i * x + j].perPtr = new Gol(j, i, 9, "gol");
+                this->map[i * x + j].perPtr = Personage::makePersonage("gol", j, i);
                 break;
             }
             case 'H':
@@ -77,7 +77,7 @@ void Game::readFromFile(std::string fileName)
             }
             case 'L':
             {
-                this->map[i * x + j].perPtr = new Lolo(j,i,6, "lolo");
+                this->map[i * x + j].perPtr = Personage::makePersonage("lolo", j, i);
                 this->lolo = static_cast<Lolo*>(this->map[i * x + j].perPtr);
                 this->lolo->makeWalkable();
                 break;
@@ -228,9 +228,9 @@ Game::~Game()
     }
 }
 
-Game &Game::Instance(Widget *w)
+Game &Game::Instance()
 {
-    static Game instance(w);
+    static Game instance;
     return instance;
 }
 
@@ -1231,19 +1231,14 @@ void Game::checkPickUp()
         lolo->setShoots(lolo->getShoots()+2);
         lolo->setHeartsPicked(lolo->getHeartsPicked()+1);
         if (lolo->getHeartsPicked() == this->getHeartsToPick())
-            this->getChest()->open();
+            this->getChest()->perfomSth();
         delete dynamic_cast<Heart*>(this->getMap()[lolo->getCoords()->y * WIDTH + lolo->getCoords()->x].objPtr);
         this->getMap()[lolo->getCoords()->y * WIDTH + lolo->getCoords()->x].objPtr = nullptr;
     }
     if (this->getMap()[lolo->getCoords()->y * WIDTH + lolo->getCoords()->x].objPtr &&
-        this->getMap()[lolo->getCoords()->y * WIDTH + lolo->getCoords()->x].objPtr == this->getChest() &&
-            this->getChest()->isOpened() && this->getChest()->hasJewellery())
+        this->getMap()[lolo->getCoords()->y * WIDTH + lolo->getCoords()->x].objPtr == this->getChest())
     {
-        this->getChest()->finish();
-        this->clear();
-        this->getEXit()->setImgName("exitopen");
-        this->getEXit()->makeWalkable();
-        this->setFirstDraw(true);
+        this->getChest()->perfomSth();
     }
     if (this->getMap()[lolo->getCoords()->y * WIDTH + lolo->getCoords()->x].objPtr &&
         this->getMap()[lolo->getCoords()->y * WIDTH + lolo->getCoords()->x].objPtr == this->getEXit())
@@ -1268,4 +1263,9 @@ int Game::shooted(Personage *p, int x, int y)
         }
     }
     return 0;
+}
+
+void Game::setWidget(Widget *w)
+{
+    this->w = w;
 }

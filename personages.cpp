@@ -299,3 +299,14 @@ void Personage::reincarnate()
 {
     this->alive = true;
 }
+
+Personage *Personage::makePersonage(std::string choice, int x, int y)
+{
+    if (choice == "lolo")
+        return new Lolo(x,y,6,"lolo");
+    if (choice == "snakey")
+        return new Snakey(x, y, 9, "snakey");
+    if (choice == "gol")
+        return new Gol(x,y,9,"gol");
+    return nullptr;
+}

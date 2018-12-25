@@ -33,7 +33,8 @@ SOURCES += \
     chest.cpp \
     drawable.cpp \
     snakey.cpp \
-    gol.cpp
+    gol.cpp \
+    state.cpp
 
 HEADERS += \
         widget.h \
@@ -45,7 +46,8 @@ HEADERS += \
     chest.h \
     drawable.h \
     snakey.h \
-    gol.h
+    gol.h \
+    state.h
 
 FORMS += \
         widget.ui

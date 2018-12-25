@@ -35,7 +35,7 @@ protected:
     QTimer      *timer = nullptr;
 private:
 public:
-        Image       pImage;
+    Image     pImage;
     Personage(bool shootable, int x, int y, int direction, std::string imgName);
     virtual void drawSelf(Widget *w) override final;
     virtual void doAction();
@@ -75,6 +75,7 @@ public:
     void            setBoolShoot(bool shoot);
     virtual void            kill();
     void            reincarnate();
+    static Personage *makePersonage(std::string choice, int x, int y);
 };
 
 #endif // PERSONAGES_H

@@ -32,12 +32,13 @@ private:
     Object *exit;
     Widget  *w;
 
-     Game(Widget *w);
+    Game();
     ~Game();
     Game(Game const&) = delete;
     Game& operator=(Game const&) = delete;
 public:
-    static Game &Instance(Widget *w);
+
+    static Game &Instance();
     void readFromFile(std::string fileName);
     void restartLevel();
     void nextLevel();
@@ -68,6 +69,7 @@ public:
     void            checkPickUp();
 
     int             shooted(Personage *p, int x, int y);
+    void   setWidget(Widget *w);
     Widget *getWidget();
 };
 
